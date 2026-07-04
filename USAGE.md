@@ -111,7 +111,7 @@ Hər target üçün paralel scan işləyir.
   "env": {
     "REDWAKE_LLM": "asdsadasad/claude-opus-4-8",
     "REDWAKE_API_KEY": "sk-...",
-    "REDWAKE_BASE_URL": "http://74.241.133.116:20128/v1",
+    "REDWAKE_BASE_URL": "<your-llm-endpoint>",
     "REDWAKE_IMAGE": "ghcr.io/redwake/redwake-sandbox:1.0.0",
     "REDWAKE_TELEMETRY": "false"
   }
@@ -204,7 +204,7 @@ Tövsiyələr:
 export REDWAKE_LICENSE_KEY='REDWAKE-LIC-...'
 export REDWAKE_LLM='asdsadasad/claude-opus-4-8'
 export REDWAKE_API_KEY='sk-...'
-export REDWAKE_BASE_URL='http://74.241.133.116:20128/v1'
+export REDWAKE_BASE_URL='<your-llm-endpoint>'
 
 # 2. Recon-only scan
 redwake -t https://target.com --non-interactive --scan-mode quick --max-budget-usd 0.50

@@ -142,8 +142,8 @@ Default path: `~/.redwake/cli-config.json`. Format:
 {
   "env": {
     "REDWAKE_LLM": "asdsadasad/claude-opus-4-8",
-    "REDWAKE_API_KEY": "sk-3616b7b559a22f56-mv531z-a09f4ee9",
-    "REDWAKE_BASE_URL": "http://74.241.133.116:20128/v1",
+    "REDWAKE_API_KEY": "sk-...",
+    "REDWAKE_BASE_URL": "<your-llm-endpoint>",
     "REDWAKE_IMAGE": "ghcr.io/redwake/redwake-sandbox:1.0.0",
     "REDWAKE_TELEMETRY": "false"
   }
