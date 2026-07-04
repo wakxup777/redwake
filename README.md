@@ -61,7 +61,7 @@ RedWake **9 env var** istifadə edir (hamısı `REDWAKE_*` prefiksi ilə; OpenAI
 
 ```bash
 # Minimum (OpenAI-compatible endpoint üçün)
-export REDWAKE_LLM='gpt-4o'                            # və ya 'asdsadasad/claude-opus-4-8' (proxy)
+export REDWAKE_LLM='gpt-4o'                            # və ya 'provider/model' (custom endpoint üçün)
 export REDWAKE_API_KEY='sk-...'
 export REDWAKE_BASE_URL='https://api.openai.com/v1'    # və ya öz proxy endpoint
 
@@ -141,7 +141,7 @@ Default path: `~/.redwake/cli-config.json`. Format:
 ```json
 {
   "env": {
-    "REDWAKE_LLM": "asdsadasad/claude-opus-4-8",
+    "REDWAKE_LLM": "<provider>/<model>",
     "REDWAKE_API_KEY": "sk-...",
     "REDWAKE_BASE_URL": "<your-llm-endpoint>",
     "REDWAKE_IMAGE": "ghcr.io/redwake/redwake-sandbox:1.0.0",
@@ -152,19 +152,15 @@ Default path: `~/.redwake/cli-config.json`. Format:
 
 Və ya `--config /path/to/cli-config.json` ilə alternativ path.
 
-### Məsləhət: fərqli LLM-ləri sınamaq
+### LLM seçimi
 
-`REDWAKE_LLM` dəyərini dəyiş:
+`REDWAKE_LLM` istənilən OpenAI-compatible model adını qəbul edir:
 
-| Model | Keyfiyyət | Sürət | Xərc | Tövsiyə |
-|---|---|---|---|---|
-| `asdsadasad/claude-opus-4-8` | ★★★★★ | yavaş | yüksək | Pentest üçün ən yaxşısı |
-| `nvidia/deepseek-ai/deepseek-v4-pro` | ★★★★ | orta | orta | Balanslaşdırılmış |
-| `gemini/gemini-3-pro-preview` | ★★★★ | sürətli | orta | Recon üçün ideal |
-| `tokyo/claude-opus-4.8` | ★★★★★ | yavaş | yüksək | Opus alternativ |
-| `fable-5` (default) | ★★★ | sürətli | aşağı | Sadə task-lar |
+- Bare adlar (`gpt-4o`, `claude-opus-4-8`) OpenAI providerinə route olunur.
+- Custom endpoint üçün provider prefix istifadə edin: `provider/model` formatı.
+- OpenAI-compatible alternativləri (`asdsadasad/...`, `nvidia/...`, `gemini/...`, `tokyo/...` və s.) proxy üzərindən işləyir.
 
-Qeyd: bare adlar (`fable-5`, `claude-opus-4.8`, `mythos-6`) OpenAI providerinə route olur, `provider/model` formatında yazmaq daha etibarlıdır.
+Model seçimi sənin endpoint-in və LLM provider-in üzərindən qurulur — yuxarıdakı nümunələr üçün provider sənə uyğun model adı verəcək.
 
 ---
 

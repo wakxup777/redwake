@@ -81,7 +81,7 @@ Hər target üçün paralel scan işləyir.
 
 | Var | Nə edir |
 |---|---|
-| `REDWAKE_LLM` | Model adı: `gpt-4o`, `claude-opus-4-8`, `asdsadasad/claude-opus-4-8` |
+| `REDWAKE_LLM` | OpenAI-compatible model adı (`gpt-4o`, `claude-opus-4-8`, `provider/model` format) |
 | `REDWAKE_API_KEY` | OpenAI-compatible API key |
 | `REDWAKE_BASE_URL` | Custom endpoint (proxy və ya local LLM üçün) |
 | `REDWAKE_API_BASE` | Alias |
@@ -109,7 +109,7 @@ Hər target üçün paralel scan işləyir.
 ```json
 {
   "env": {
-    "REDWAKE_LLM": "asdsadasad/claude-opus-4-8",
+    "REDWAKE_LLM": "<provider>/<model>",
     "REDWAKE_API_KEY": "sk-...",
     "REDWAKE_BASE_URL": "<your-llm-endpoint>",
     "REDWAKE_IMAGE": "ghcr.io/redwake/redwake-sandbox:1.0.0",
@@ -177,7 +177,7 @@ Agent bütün konteksti bərpa edir, sıfırdan başlamır.
 export REDWAKE_LLM='gpt-4o'
 
 # Custom proxy prefix (recommended for stability)
-export REDWAKE_LLM='asdsadasad/claude-opus-4-8'
+export REDWAKE_LLM='<provider>/<model>'
 
 # Multi-step reasoning
 export REDWAKE_REASONING_EFFORT='xhigh'
@@ -186,14 +186,7 @@ export REDWAKE_REASONING_EFFORT='xhigh'
 export REDWAKE_REASONING_EFFORT='low'
 ```
 
-Tövsiyələr:
-| Model | Pentest keyfiyyəti | Xərc | Tövsiyə |
-|---|---|---|---|
-| `asdsadasad/claude-opus-4-8` | ★★★★★ | yüksək | Real engagement üçün ən yaxşı |
-| `nvidia/deepseek-ai/deepseek-v4-pro` | ★★★★ | orta | Balans |
-| `gemini/gemini-3-pro-preview` | ★★★★ | orta | Recon üçün |
-| `tokyo/claude-opus-4.8` | ★★★★★ | yüksək | Opus alternativ |
-| `fable-5` | ★★★ | aşağı | Quick test / CI |
+Model seçimi sənin endpoint-in və LLM provider-in ilə müəyyən olunur. Bare adlar (`gpt-4o`, `claude-opus-4-8`) OpenAI providerinə route olunur; provider prefix istifadə edərək (`provider/model` formatı) custom endpoint-ləri göstərə bilərsiniz.
 
 ---
 
@@ -202,7 +195,7 @@ Tövsiyələr:
 ```bash
 # 1. Env qur (bir dəfə)
 export REDWAKE_LICENSE_KEY='REDWAKE-LIC-...'
-export REDWAKE_LLM='asdsadasad/claude-opus-4-8'
+export REDWAKE_LLM='<provider>/<model>'
 export REDWAKE_API_KEY='sk-...'
 export REDWAKE_BASE_URL='<your-llm-endpoint>'
 
