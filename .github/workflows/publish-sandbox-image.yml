@@ -1,0 +1,67 @@
+name: Publish RedWake Sandbox Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g. 1.0.4)'
+        required: true
+        default: 'dev'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Build & Push RedWake sandbox image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${{ inputs.tag }}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Building image: ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:${VERSION}"
+
+      - name: Build image
+        run: |
+          docker build \
+            -f containers/Dockerfile \
+            -t ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:${VERSION} \
+            -t ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:latest \
+            .
+
+      - name: Push image with version tag
+        run: docker push ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:${VERSION}
+
+      - name: Push image with latest tag
+        run: docker push ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:latest
+
+      - name: Summary
+        run: |
+          echo "## Sandbox image published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:${VERSION}**" >> $GITHUB_STEP_SUMMARY
+          echo "- ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:latest" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Verify:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ghcr.io/${GITHUB_REPOSITORY}/redwake-sandbox:${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
