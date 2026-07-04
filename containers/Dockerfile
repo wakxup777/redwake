@@ -65,11 +65,12 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/b
 USER pentester
 WORKDIR /tmp
 
-RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest && \
-    go install -v github.com/projectdiscovery/katana/cmd/katana@latest && \
-    go install -v github.com/projectdiscovery/cvemap/cmd/vulnx@latest && \
-    go install -v github.com/jaeles-project/gospider@latest && \
-    go install -v github.com/projectdiscovery/interactsh/cmd/interactsh-client@latest
+RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest || true; \
+    go install -v github.com/projectdiscovery/katana/cmd/katana@latest || true; \
+    go install -v github.com/projectdiscovery/cvemap/cmd/vulnx@latest || true; \
+    go install -v github.com/jaeles-project/gospider@latest || true; \
+    go install -v github.com/projectdiscovery/interactsh/cmd/interactsh-client@latest || true; \
+    echo "Go tool installation complete (some may have failed; non-fatal)"
 
 RUN nuclei -update-templates
 
