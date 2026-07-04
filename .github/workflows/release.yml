@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  attestations: write
+  id-token: write
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run pyinstaller --clean redwake.spec
+      - name: Strip
+        run: objcopy --remove-section .comment dist/redwake
+      - name: Generate checksum
+        run: sha256sum dist/redwake > SHA256SUMS
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: redwake-linux-x86_64
+          path: dist/redwake
+
+  build-macos-intel:
+    name: Build macOS Intel
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run pyinstaller --clean redwake.spec
+      - name: Sign (placeholder)
+        run: codesign --force --sign - dist/redwake 2>/dev/null || echo "skip"
+      - run: mv dist/redwake dist/redwake-darwin-x86_64
+      - run: sha256sum dist/redwake-darwin-x86_64 >> SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redwake-darwin-x86_64
+          path: dist/redwake-darwin-x86_64
+
+  build-macos-arm:
+    name: Build macOS ARM
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run pyinstaller --clean redwake.spec
+      - name: Sign (placeholder)
+        run: codesign --force --sign - dist/redwake 2>/dev/null || echo "skip"
+      - run: mv dist/redwake dist/redwake-darwin-arm64
+      - run: sha256sum dist/redwake-darwin-arm64 >> SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redwake-darwin-arm64
+          path: dist/redwake-darwin-arm64
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+        with:
+          python-version: '3.12'
+      - run: uv sync --dev
+      - run: uv run pyinstaller --clean redwake.spec
+      - run: mv dist/redwake.exe dist/redwake.exe
+      - run: sha256sum dist/redwake.exe >> SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redwake.exe
+          path: dist/redwake.exe
+
+  release:
+    name: Publish Release
+    needs: [build-linux, build-macos-intel, build-macos-arm, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist/
+      - name: Combine checksums
+        run: cat dist/*/SHA256SUMS > SHA256SUMS || true
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/redwake-linux-x86_64/redwake
+            dist/redwake-darwin-x86_64/redwake-darwin-x86_64
+            dist/redwake-darwin-arm64/redwake-darwin-arm64
+            dist/redwake.exe/redwake.exe
+            SHA256SUMS
+          body: |
+            ## RedWake ${{ github.ref_name }}
+
+            See [CHANGELOG.md](../blob/main/CHANGELOG.md) for changes.
+
+            ## Installation
+
+            ```bash
+            # Linux x86_64
+            curl -L https://github.com/redwake/redwake/releases/latest/download/redwake-linux-x86_64 -o ~/.local/bin/redwake
+            chmod +x ~/.local/bin/redwake
+
+            # Verify checksum
+            curl -L https://github.com/redwake/redwake/releases/latest/download/SHA256SUMS | sha256sum -c -
+            ```
+
+            ## License
+
+            Requires a valid `REDWAKE_LICENSE_KEY`. Contact your admin.
+          draft: true

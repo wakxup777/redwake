@@ -1,0 +1,74 @@
+name: License Help
+description: License activation, revocation, or activation problems
+labels: ["license", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before opening this issue, try [TROUBLESHOOTING.md](../TROUBLESHOOTING.md#lisenziya-xətaları).**
+        Most license issues are resolved there.
+
+        For license **purchase / issuance / billing** questions, contact your
+        admin directly — GitHub Issues is not the right channel.
+
+  - type: input
+    id: license_key
+    attributes:
+      label: License key prefix
+      description: |
+        First 12 chars only (we don't need the full key for triage).
+        Example: `REDWAKE-LIC-OR`
+      placeholder: "REDWAKE-LIC-MFSG22LOI"
+    validations:
+      required: true
+
+  - type: input
+    id: user_id
+    attributes:
+      label: User identifier
+      description: |
+        The identifier admin issued this license to (usually your email).
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue type
+      options:
+        - "REDWAKE_LICENSE_KEY not set"
+        - License key has been revoked
+        - License server unreachable
+        - Fingerprint mismatch
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Exact error message
+      description: Paste the full error from the terminal
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: |
+        - OS (with version)
+        - Install method (binary / from source / docker)
+        - Did you change machines recently?
+        - Do you share this license with anyone else?
+
+  - type: checkboxes
+    id: attempts
+    attributes:
+      label: What you've tried
+      options:
+        - label: Read [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) license section
+        - label: Cleared `~/.redwake/.license_cache` and `~/.redwake/.endpoint`
+        - label: Verified network connectivity
+        - label: Confirmed license key is correctly set (`echo $REDWAKE_LICENSE_KEY`)
+        - label: Verified with admin that license is active

@@ -1,0 +1,114 @@
+name: Bug Report
+description: Report a bug in RedWake (client side)
+labels: ["bug", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the form below.
+        For **license activation issues**, use the "License Help" template instead.
+        For **security vulnerabilities**, see [SECURITY.md](../SECURITY.md).
+
+  - type: input
+    id: version
+    attributes:
+      label: RedWake version
+      description: Run `redwake --version` and paste the output
+      placeholder: "redwake 1.0.4"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Linux (Debian/Ubuntu)
+        - Linux (RHEL/Fedora)
+        - Linux (Arch)
+        - Linux (Alpine)
+        - macOS (Intel)
+        - macOS (Apple Silicon)
+        - Windows (WSL2)
+        - Windows (native)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Install method
+      options:
+        - Pre-built binary (./install.sh)
+        - From source (uv sync + pyinstaller)
+        - Docker
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Bug summary
+      description: One-sentence summary
+      placeholder: "Scan fails with 'Tool not found' error"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Minimal steps to reproduce the bug.
+        Include the exact command line and any config files used.
+      placeholder: |
+        1. Run `redwake -t https://example.com --non-interactive --scan-mode quick`
+        2. Wait 2 minutes
+        3. See error: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened? Paste relevant log/error output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: |
+        Paste from `redwake_runs/<run>/redwake.log` if available.
+        Set `REDWAKE_DEBUG=1` for verbose logging.
+
+  - type: input
+    id: llm
+    attributes:
+      label: LLM model
+      description: Which model did you use?
+      placeholder: "asdsadasad/claude-opus-4-8"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Troubleshooting attempts
+      options:
+        - label: I read [TROUBLESHOOTING.md](../TROUBLESHOOTING.md)
+        - label: I cleared `~/.redwake/` cache
+        - label: I tried a different scan mode (quick/standard/deep)
+        - label: I tried a different LLM model
+        - label: I searched existing issues

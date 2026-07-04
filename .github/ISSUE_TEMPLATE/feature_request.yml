@@ -1,0 +1,56 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the feature you'd like to see in RedWake.
+        For **bug reports**, use the Bug Report template instead.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: |
+        What problem does this solve? Who is affected?
+      placeholder: |
+        As a pentester, I often need to test multiple related endpoints
+        with the same auth context. Currently I have to manually copy
+        cookies/tokens between redwake runs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you solve it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider? Why is yours better?
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example usage
+      description: |
+        Show what the command line or config would look like.
+      placeholder: |
+        ```bash
+        redwake --auth-context-file ./session.json -t https://app.com
+        ```
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Nice to have
+        - Should have
+        - Must have
