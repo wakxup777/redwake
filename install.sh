@@ -88,9 +88,10 @@ ensure_docker() {
     fi
 }
 
-# ── Sandbox image (pre-pull the rebranded alias) ──
+# ── Sandbox image (pre-pull the rebranded alias, with fallback) ──
 ensure_sandbox_image() {
     local DEFAULT_IMAGE="ghcr.io/redwake/redwake-sandbox:1.0.0"
+    local FALLBACK_IMAGE="ghcr.io/usestrix/strix-sandbox:1.0.0"
 
     # If rebranded image already exists locally, skip
     if docker image inspect "${DEFAULT_IMAGE}" >/dev/null 2>&1; then
@@ -98,12 +99,27 @@ ensure_sandbox_image() {
         return 0
     fi
 
-    # Try pull (will succeed once admin publishes the rebranded image)
+    # If fallback image exists locally, just re-tag it
+    if docker image inspect "${FALLBACK_IMAGE}" >/dev/null 2>&1; then
+        log "Re-tagging ${FALLBACK_IMAGE} → ${DEFAULT_IMAGE}"
+        docker tag "${FALLBACK_IMAGE}" "${DEFAULT_IMAGE}"
+        return 0
+    fi
+
+    # Try pull rebranded first
     log "Pulling sandbox image (one-time, ~3GB)..."
-    if docker pull "${DEFAULT_IMAGE}"; then
+    if docker pull "${DEFAULT_IMAGE}" 2>/dev/null; then
         log "Pulled: ${DEFAULT_IMAGE}"
+        return 0
+    fi
+
+    # Fallback: pull upstream image and re-tag
+    warn "Rebranded image not yet published, pulling upstream + re-tagging..."
+    if docker pull "${FALLBACK_IMAGE}" 2>/dev/null; then
+        docker tag "${FALLBACK_IMAGE}" "${DEFAULT_IMAGE}"
+        log "Re-tagged: ${DEFAULT_IMAGE}"
     else
-        err "Failed to pull ${DEFAULT_IMAGE}. Contact admin to publish the image, or set REDWAKE_IMAGE to an existing tag manually."
+        err "Failed to pull sandbox image (tried both ${DEFAULT_IMAGE} and ${FALLBACK_IMAGE}). Set REDWAKE_IMAGE manually or check your network."
     fi
 }
 
