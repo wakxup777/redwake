@@ -127,7 +127,7 @@ export REDWAKE_LLM='gpt-5-mini'    # sürətli, keyfiyyətli
 export REDWAKE_REASONING_EFFORT='low'
 ```
 
-Keyfiyyət aşağı düşə bilər — pentest üçün `asdsadasad/claude-opus-4-8` tövsiyə olunur.
+Keyfiyyət aşağı düşə bilər — model seçimi sənin LLM endpoint-in və balansına bağlıdır.
 
 ## Hüquqi
 

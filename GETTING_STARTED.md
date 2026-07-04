@@ -52,7 +52,7 @@ source ~/.zshrc
 OpenAI-compatible endpoint üçün (OpenAI, Anthropic proxy, local LLM):
 
 ```bash
-export REDWAKE_LLM='gpt-4o'                       # və ya 'asdsadasad/claude-opus-4-8'
+export REDWAKE_LLM='gpt-4o'                       # və ya 'provider/model' (custom endpoint üçün)
 export REDWAKE_API_KEY='sk-...'
 export REDWAKE_BASE_URL='https://api.openai.com/v1'   # və ya proxy URL
 ```

@@ -158,7 +158,7 @@ Və ya `--config /path/to/cli-config.json` ilə alternativ path.
 
 - Bare adlar (`gpt-4o`, `claude-opus-4-8`) OpenAI providerinə route olunur.
 - Custom endpoint üçün provider prefix istifadə edin: `provider/model` formatı.
-- OpenAI-compatible alternativləri (`asdsadasad/...`, `nvidia/...`, `gemini/...`, `tokyo/...` və s.) proxy üzərindən işləyir.
+- OpenAI-compatible alternativlər provider prefix istifadə edərək (custom endpoint vasitəsilə) işləyir.
 
 Model seçimi sənin endpoint-in və LLM provider-in üzərindən qurulur — yuxarıdakı nümunələr üçün provider sənə uyğun model adı verəcək.
 

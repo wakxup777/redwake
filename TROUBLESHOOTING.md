@@ -115,7 +115,7 @@ UNKNOWN MODEL NAME
 
 **Həll:** Provider prefix istifadə et:
 ```bash
-export REDWAKE_LLM='asdsadasad/claude-opus-4-8'  # proxy ilə işləyir
+export REDWAKE_LLM='<provider>/<model>'  # proxy ilə işləyir
 ```
 
 ### "InternalServerError: Hosted_vllmException"
