@@ -100,7 +100,7 @@ body:
     attributes:
       label: LLM model
       description: Which model did you use?
-      placeholder: "asdsadasad/claude-opus-4-8"
+      placeholder: "<provider>/<model>"
 
   - type: checkboxes
     id: checks
