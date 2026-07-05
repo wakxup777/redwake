@@ -305,6 +305,54 @@ EOF
 
 ## 🔌 İnteqrasiyalar
 
+### MCP Server (Claude Code / Cursor / Windsurf)
+
+RedWake **Model Context Protocol (MCP)** server təqdim edir ki, IDE AI agentləri (Claude Code, Cursor, Windsurf və s.) birbaşa pentest funksiyalarını çağıra bilsin.
+
+**Server başlat:**
+
+```bash
+redwake --mcp-serve --mcp-port 9877 --mcp-auth-token YOUR_SECRET_TOKEN
+# JSON-RPC 2.0 endpoint: POST http://localhost:9877/mcp
+```
+
+**Claude Code-a qoşma** (`~/.claude.json`):
+
+```json
+{
+  "mcpServers": {
+    "redwake": {
+      "type": "http",
+      "url": "http://localhost:9877/mcp",
+      "headers": { "Authorization": "Bearer YOUR_SECRET_TOKEN" }
+    }
+  }
+}
+```
+
+**Mövcud MCP tool-ları:**
+
+| Tool | Təsvir |
+|---|---|
+| `redwake_audit_target` | Verilmiş URL-ə qarşı tam penetration test başladır (sandbox, multi-agent) |
+| `redwake_get_findings` | Son / müəyyən edilmiş run-un vulnerability siyahısını qaytarır (SARIF formatında) |
+| `redwake_get_progress` | İşləyən scan-in real-time vəziyyəti (status, vulnerabilities, token usage, cost) |
+| `redwake_recommend_mitigations` | Tapılmış vulnerability-lər üçün remediation plan yaradır |
+| `redwake_list_scans` | Bütün scan run-larını siyahılayır (status, timestamp, target) |
+| `redwake_compare_scans` | İki scan-in nəticələrini müqayisə edir (yeni vulnerabilities, regressions) |
+| `redwake_export_report` | Konkret run-un penetration test report-unu ixrac edir (markdown / SARIF / PDF) |
+| `redwake_get_remediations` | Vulnerability üçün konkret kod patch-ləri / fix təklifləri |
+
+**İstifadə nümunəsi** (Claude Code-da):
+
+```
+"Claude, testphp.vulnweb.com-a RedWake pentest başlat, amma IDOR və SQLi-yə fokus ol"
+```
+
+Claude MCP vasitəsilə `redwake_audit_target` çağırır, scan bitəndən sonra `redwake_get_findings` ilə nəticəni oxuyur.
+
+**Auth:** `--mcp-auth-token` qoymusan, hər request `Authorization: Bearer <token>` header tələb edir. Token qoymamısan → auth disabled (yalnız localhost üçün tövsiyə olunur).
+
 ### Webhook bildirişləri (Slack / Discord / Teams)
 
 Scan bitəndən sonra avtomatik bildiriş göndərmək üçün webhook URL təyin et:
