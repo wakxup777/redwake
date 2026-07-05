@@ -216,6 +216,7 @@ Mütləq (biri):
       --diff-base REF        # diff-scope base branch
       --config FILE          # alternativ config
       --max-budget-usd N     # LLM cost limit
+      --demo                  # TUI preview (scan başlatmadan rəng/layout)
 ```
 
 ---

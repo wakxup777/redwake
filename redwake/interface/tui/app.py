@@ -100,7 +100,7 @@ class ChatTextArea(TextArea):  # type: ignore[misc]
 
 class SplashScreen(Static):  # type: ignore[misc]
     ALLOW_SELECT = False
-    PRIMARY_GREEN = "#22c55e"
+    PRIMARY_RED = "#ef4444"
     BANNER = (
         " ██████╗ ███████╗██████╗ ██╗    ██╗ █████╗ ██╗  ██╗███████╗\n"
         " ██╔══██╗██╔════╝██╔══██╗██║    ██║██╔══██╗██║ ██╔╝██╔════╝\n"
@@ -146,7 +146,7 @@ class SplashScreen(Static):  # type: ignore[misc]
 
     def _build_panel(self, start_line: Text) -> Panel:
         content = Group(
-            Align.center(Text(self.BANNER.strip("\n"), style=self.PRIMARY_GREEN, justify="center")),
+            Align.center(Text(self.BANNER.strip("\n"), style=self.PRIMARY_RED, justify="center")),
             Align.center(Text(" ")),
             Align.center(self._build_welcome_text()),
             Align.center(self._build_version_text()),
@@ -157,14 +157,14 @@ class SplashScreen(Static):  # type: ignore[misc]
             Align.center(self._build_url_text()),
         )
 
-        return Panel.fit(content, border_style=self.PRIMARY_GREEN, padding=(1, 6))
+        return Panel.fit(content, border_style=self.PRIMARY_RED, padding=(1, 6))
 
     def _build_url_text(self) -> Text:
-        return Text("redwake.rf.gd", style=Style(color=self.PRIMARY_GREEN, bold=True))
+        return Text("redwake.rf.gd", style=Style(color=self.PRIMARY_RED, bold=True))
 
     def _build_welcome_text(self) -> Text:
         text = Text("Welcome to ", style=Style(color="white", bold=True))
-        text.append("RedWake", style=Style(color=self.PRIMARY_GREEN, bold=True))
+        text.append("RedWake", style=Style(color=self.PRIMARY_RED, bold=True))
         text.append("!", style=Style(color="white", bold=True))
         return text
 
@@ -720,13 +720,13 @@ class RedWakeTUIApp(App):  # type: ignore[misc]
         self._sweep_num_squares: int = 6
         self._sweep_colors: list[str] = [
             "#000000",  # Dimmest (shows dot)
-            "#031a09",
-            "#052e16",
-            "#0d4a2a",
-            "#15803d",
-            "#22c55e",
-            "#4ade80",
-            "#86efac",  # Brightest
+            "#1a0606",
+            "#2d0a0a",
+            "#450f0f",
+            "#6b1414",
+            "#991b1b",
+            "#c73838",
+            "#ef4444",  # Brightest (RedWake brand red)
         ]
         self._dot_animation_timer: Any | None = None
 

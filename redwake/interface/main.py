@@ -476,6 +476,15 @@ Examples:
     )
 
     parser.add_argument(
+        "--demo",
+        action="store_true",
+        help=(
+            "Preview the TUI look (panels, colors, layout) without starting "
+            "any scan. Useful to verify terminal color support."
+        ),
+    )
+
+    parser.add_argument(
         "--mcp-serve",
         action="store_true",
         help=(
@@ -803,6 +812,14 @@ def main() -> None:
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+    # --demo bypasses the required -t/--mount/--resume check by injecting a
+    # placeholder target that never triggers a real scan (run_cli short-circuits
+    # before any sandbox/LLM interaction).
+    if "--demo" in sys.argv and not any(
+        a in ("-t", "--target", "--mount", "--resume") for a in sys.argv
+    ):
+        sys.argv += ["-t", "demo.invalid"]
+
     args = parse_arguments()
 
     # MCP server mode: start JSON-RPC server in a fresh subprocess and exit.
@@ -906,7 +923,7 @@ def main() -> None:
 
     exit_reason = "user_exit"
     try:
-        if args.non_interactive:
+        if args.demo or args.non_interactive:
             asyncio.run(run_cli(args))
         else:
             asyncio.run(run_tui(args))

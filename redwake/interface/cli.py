@@ -35,7 +35,94 @@ def _resolve_sandbox_image() -> str:
     return image
 
 
+async def _render_demo_tui() -> None:
+    """Render the TUI panels with mock data so users can preview the look."""
+    console = Console()
+
+    start_text = Text()
+    start_text.append("Penetration test initiated", style="bold #ef4444")
+
+    target_line = Text()
+    target_line.append("Target   ", style="dim")
+    target_line.append("http://testphp.vulnweb.com (demo)", style="bold white")
+
+    output_line = Text()
+    output_line.append("Output   ", style="dim")
+    output_line.append("redwake_runs/demo/", style="#60a5fa")
+
+    note_line = Text()
+    note_line.append("\n", style="dim")
+    note_line.append("Vulnerabilities will be displayed in real-time.", style="dim")
+
+    startup_panel = Panel(
+        Text.assemble(start_text, "\n\n", target_line, "\n", output_line, note_line),
+        title="[bold #ef4444]REDWAKE",
+        title_align="right",
+        border_style="#ef4444",
+        padding=(1, 2),
+    )
+
+    console.print("\n")
+    console.print(startup_panel)
+    console.print()
+
+    # Live status panel (mock)
+    status_text = Text()
+    status_text.append("Penetration test in progress", style="bold #ef4444")
+    status_text.append("\n\n")
+    status_text.append("Status   ", style="dim")
+    status_text.append("running recon (3/5 agents)", style="white")
+    status_text.append("\n")
+    status_text.append("Found    ", style="dim")
+    status_text.append("2 vulnerabilities", style="bold #ef4444")
+    status_text.append("\n")
+    status_text.append("Elapsed  ", style="dim")
+    status_text.append("00:02:31", style="white")
+    status_text.append("\n")
+    status_text.append("Budget   ", style="dim")
+    status_text.append("$0.14 / $2.00", style="white")
+
+    live_panel = Panel(
+        status_text,
+        title="[bold #ef4444]REDWAKE",
+        title_align="right",
+        border_style="#ef4444",
+        padding=(1, 2),
+    )
+    console.print(live_panel)
+    console.print()
+
+    # Vulnerability panel (mock)
+    vuln_text = Text()
+    vuln_text.append("VULN-001", style="bold #ef4444")
+    vuln_text.append("  ", style="dim")
+    vuln_text.append("HIGH", style="bold #ef4444")
+    vuln_text.append("  CVSS 7.5\n\n", style="dim")
+    vuln_text.append("OpenAI-Compatible Models Endpoint\n", style="bold white")
+    vuln_text.append(
+        "The OpenAI-compatible /api/v1/models endpoint is exposed without "
+        "authentication and returns the full catalog of AI models routed by "
+        "the platform. The response tasks: (a) every upstream provider "
+        "identifier...",
+        style="white",
+    )
+    vuln_panel = Panel(
+        vuln_text,
+        title="[bold #ef4444]VULN-001",
+        title_align="right",
+        border_style="#ef4444",
+        padding=(1, 2),
+    )
+    console.print(vuln_panel)
+    console.print()
+    console.print("[dim]This is a preview — no scan was started.[/]")
+
+
 async def run_cli(args: Any) -> None:  # noqa: PLR0915
+    if getattr(args, "demo", False):
+        await _render_demo_tui()
+        return
+
     console = Console()
 
     start_text = Text()
