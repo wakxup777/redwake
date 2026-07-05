@@ -1,0 +1,46 @@
+name: Publish RedWake Sandbox Image
+
+on: workflow_dispatch
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug info
+        run: |
+          echo "=== GitHub actor: ${{ github.actor }}"
+          echo "=== GitHub repo: ${{ github.repository }}"
+          echo "=== Event name: ${{ github.event_name }}"
+          echo "=== Working dir: $(pwd)"
+          echo "=== Files in repo:"
+          ls -la
+          echo "=== containers/:"
+          ls -la containers/ 2>&1
+          echo "=== Dockerfile first 5 lines:"
+          head -5 containers/Dockerfile 2>&1
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: containers/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/redwake-sandbox:1.0.0
+            ghcr.io/${{ github.repository }}/redwake-sandbox:latest
+          platforms: linux/amd64

@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run ruff check redwake
+      - run: uv run ruff format --check redwake
+
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run mypy redwake
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run pytest
+
+  build-smoke:
+    name: Build smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/uv-action@v3
+      - run: uv sync --dev
+      - run: uv run pyinstaller --clean redwake.spec
+      - run: ls -lh dist/redwake
