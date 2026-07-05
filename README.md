@@ -1,14 +1,22 @@
 # RedWake — Multi-Agent AI Penetration Testing
 
 <p align="center">
-  <a href="https://redwake.rf.gd"><img src="https://img.shields.io/badge/Website-redwake.rf.gd-2b9246?style=for-the-badge" alt="Website"></a>
+  <a href="https://redwake.rf.gd"><img src="https://img.shields.io/badge/Website-redwake.rf.gd-ef4444?style=for-the-badge" alt="Website"></a>
   <a href="https://docs.redwake.rf.gd"><img src="https://img.shields.io/badge/Docs-docs.redwake.rf.gd-3b82f6?style=for-the-badge" alt="Docs"></a>
   <a href="https://redwake.rf.gd/contact"><img src="https://img.shields.io/badge/Contact-redwake.rf.gd%2Fcontact-f0f0f0?style=for-the-badge" alt="Contact"></a>
+</p>
+
+<p align="center">
+  <img src="docs/images/logo.png" width="180" alt="RedWake Logo"/>
 </p>
 
 **Avtonom AI penetration testing agentləri — real hacker kimi davranır, kodu dinamik olaraq işlədir, zəiflikləri tapır və real proof-of-concept-lərlər təsdiqləyir.**
 
 RedWake, **RedWake Security Labs** tərəfindən hazırlanmış açıq mənbəli çox-agentli AI penetration testing platformasıdır. **Pulsuz, açıq, lisenziyasız.**
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="RedWake Consolidated Security Dashboard"/>
+</p>
 
 ---
 
