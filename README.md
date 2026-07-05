@@ -12,7 +12,7 @@
 
 **Avtonom AI penetration testing agentləri — real hacker kimi davranır, kodu dinamik olaraq işlədir, zəiflikləri tapır və real proof-of-concept-lərlər təsdiqləyir.**
 
-RedWake, **RedWake Security Labs** tərəfindən hazırlanmış açıq mənbəli çox-agentli AI penetration testing platformasıdır. **Pulsuz, açıq, lisenziyasız.**
+RedWake açıq mənbəli çox-agentli AI penetration testing platformasıdır. **Pulsuz, açıq, lisenziyasız — kommunal layihə.**
 
 <p align="center">
   <img src="docs/images/dashboard.png" alt="RedWake Consolidated Security Dashboard"/>
@@ -353,4 +353,4 @@ PR-lar qəbul edilir. Töhfə üçün [CONTRIBUTING.md](CONTRIBUTING.md)-ə bax.
 
 **Lisenziya:** Apache 2.0 — bax: [LICENSE](LICENSE)
 
-Bu alət **yalnız sizin sahib olduğunuz və ya yazılı icazəniz olan sistemlərə qarşı** istifadə üçündür. İcazəsiz giriş qanunsuzdur. RedWake Security Labs aləti "AS IS" təqdim edir, sui-istifadəyə görə məsuliyyət daşımır.
+Bu alət **yalnız sizin sahib olduğunuz və ya yazılı icazəniz olan sistemlərə qarşı** istifadə üçündür. İcazəsiz giriş qanunsuzdur. RedWake aləti "AS IS" təqdim edir, sui-istifadəyə görə məsuliyyət daşımır.
