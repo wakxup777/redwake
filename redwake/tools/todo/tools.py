@@ -257,7 +257,7 @@ def _apply_single_update(
 
 
 @function_tool(timeout=30)
-async def create_todo(ctx: RunContextWrapper, todos: str) -> str:
+async def create_todo(ctx: RunContextWrapper, todos: Any) -> str:
     """Create one or many todos for the current agent.
 
     Always pass a list, even for a single todo (wrap it in a one-item array).
@@ -404,7 +404,7 @@ async def list_todos(
 
 
 @function_tool(timeout=30)
-async def update_todo(ctx: RunContextWrapper, updates: str) -> str:
+async def update_todo(ctx: RunContextWrapper, updates: Any) -> str:
     """Update one or many todos.
 
     Always pass a list, even for a single update (wrap it in a one-item
@@ -514,7 +514,7 @@ def _mark(*, agent_id: str, todo_ids: str, new_status: str) -> str:
 
 
 @function_tool(timeout=30)
-async def mark_todo_done(ctx: RunContextWrapper, todo_ids: str) -> str:
+async def mark_todo_done(ctx: RunContextWrapper, todo_ids: Any) -> str:
     """Mark one or many todos as done.
 
     Always pass a list, even for a single ID (wrap it in a one-item array).
@@ -527,7 +527,7 @@ async def mark_todo_done(ctx: RunContextWrapper, todo_ids: str) -> str:
 
 
 @function_tool(timeout=30)
-async def mark_todo_pending(ctx: RunContextWrapper, todo_ids: str) -> str:
+async def mark_todo_pending(ctx: RunContextWrapper, todo_ids: Any) -> str:
     """Reset one or many todos to pending (e.g., to retry a failed task).
 
     Always pass a list, even for a single ID (wrap it in a one-item array).
@@ -540,7 +540,7 @@ async def mark_todo_pending(ctx: RunContextWrapper, todo_ids: str) -> str:
 
 
 @function_tool(timeout=30)
-async def delete_todo(ctx: RunContextWrapper, todo_ids: str) -> str:
+async def delete_todo(ctx: RunContextWrapper, todo_ids: Any) -> str:
     """Delete one or many todos. Removes them entirely (no soft-delete).
 
     Always pass a list, even for a single ID (wrap it in a one-item array).
