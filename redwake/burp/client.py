@@ -84,7 +84,7 @@ class BurpClient:
                     {
                         "protocolVersion": MCP_PROTOCOL_VERSION,
                         "capabilities": {},
-                        "clientInfo": {"name": "redwake", "version": "1.0.4"},
+                        "clientInfo": {"name": "redwake", "version": "1.0.0"},
                     },
                 )
                 self._version = (result.get("serverInfo") or {}).get("version", "")

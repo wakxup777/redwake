@@ -14,7 +14,7 @@ Zəhmət olmasa **public GitHub issue açmayın** təhlükəsizlik zəiflikləri
 
 1. **Zəifliyin təsviri**
 2. **Addım-addım reproduksiya** (kifayət qədər detallı)
-3. **Təsirə məruz qalan versiyalar** (məs., v1.0.4-redwake.1)
+3. **Təsirə məruz qalan versiyalar** (məs., v1.0.0-redwake.1)
 4. **Impact** qiymətləndirməsi (RCE, info disclosure, və s.)
 5. **Mühit** (OS, Python versiyası, quraşdırma üsulu)
 

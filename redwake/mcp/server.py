@@ -23,7 +23,7 @@ from .tools import TOOL_HANDLERS, TOOL_SCHEMAS
 logger = logging.getLogger(__name__)
 
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_INFO = {"name": "redwake", "version": "1.0.4"}
+SERVER_INFO = {"name": "redwake", "version": "1.0.0"}
 
 
 class MCPRequestHandler(BaseHTTPRequestHandler):

@@ -227,7 +227,7 @@ curl -L https://github.com/wakxup777/redwake/releases/latest/download/SHA256SUMS
 
 ```bash
 redwake --version
-# Expected: redwake 1.0.4 (və ya daha yeni)
+# Expected: redwake 1.0.0 (və ya daha yeni)
 
 redwake --help
 # Expected: usage info + "RedWake Multi-Agent Cybersecurity Penetration Testing Tool"
