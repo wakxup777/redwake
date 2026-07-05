@@ -15,7 +15,7 @@ Thank you for your interest in contributing to RedWake! This guide will help you
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/redwake/redwake.git
+   git clone https://github.com/wakxup777/redwake.git
    cd redwake
    ```
 
@@ -102,7 +102,7 @@ We welcome feature ideas! Please:
 ## 🤝 Community
 
 - **Discord**: [Join our community](https://redwake.rf.gd/contact)
-- **Issues**: [GitHub Issues](https://github.com/redwake/redwake/issues)
+- **Issues**: [GitHub Issues](https://github.com/wakxup777/redwake/issues)
 
 ## ✨ Recognition
 

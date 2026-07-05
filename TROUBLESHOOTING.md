@@ -150,6 +150,6 @@ Yenidən başladıqda ilk run-da image təkrar çəkilir (~1-3 dəq).
 ## Yardım alma
 
 1. **FAQ.md** — ümumi suallar
-2. **GitHub Issues:** https://github.com/redwake/redwake/issues
-3. **License support:** admin səninlə əlaqə
+2. **GitHub Issues:** https://github.com/wakxup777/redwake/issues
+3. **Community support:** GitHub Discussions
 4. **Təhlükəsizlik problemi:** security@redwake.rf.gd

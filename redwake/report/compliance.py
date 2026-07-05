@@ -118,10 +118,19 @@ CWE_MAP: dict[str, str] = {
 # the reverse query "which PCI-DSS requirements does this finding touch?"
 PCI_DSS_V4: dict[str, list[str]] = {
     "6.2.4": [
-        "SQL Injection", "NoSQL Injection", "Command Injection",
-        "XSS Reflected", "XSS Stored", "LDAP Injection", "XPath Injection",
-        "SSTI", "Header Injection", "Path Traversal", "XXE",
-        "Insecure Deserialization", "Deserialization",
+        "SQL Injection",
+        "NoSQL Injection",
+        "Command Injection",
+        "XSS Reflected",
+        "XSS Stored",
+        "LDAP Injection",
+        "XPath Injection",
+        "SSTI",
+        "Header Injection",
+        "Path Traversal",
+        "XXE",
+        "Insecure Deserialization",
+        "Deserialization",
     ],
     "6.2.1": ["Broken Access Control", "IDOR", "Missing Authorization"],
     "6.3.1": ["Weak Credentials", "Credential Stuffing", "Hardcoded Credentials"],
@@ -139,9 +148,17 @@ PCI_DSS_V4: dict[str, list[str]] = {
 
 NIST_800_53: dict[str, list[str]] = {
     "SI-10": [
-        "SQL Injection", "NoSQL Injection", "Command Injection",
-        "XSS Reflected", "XSS Stored", "LDAP Injection", "XPath Injection",
-        "SSTI", "Header Injection", "Path Traversal", "XXE",
+        "SQL Injection",
+        "NoSQL Injection",
+        "Command Injection",
+        "XSS Reflected",
+        "XSS Stored",
+        "LDAP Injection",
+        "XPath Injection",
+        "SSTI",
+        "Header Injection",
+        "Path Traversal",
+        "XXE",
     ],
     "AC-3": ["Broken Access Control", "IDOR", "Missing Authorization"],
     "AC-6": ["Privilege Escalation", "Exposed Admin Interface"],
@@ -168,10 +185,7 @@ NIST_800_53: dict[str, list[str]] = {
 def _vuln_type(finding: dict[str, Any]) -> str:
     """Extract a normalised vulnerability type from a finding dict."""
     return str(
-        finding.get("vulnerability_type")
-        or finding.get("type")
-        or finding.get("category")
-        or ""
+        finding.get("vulnerability_type") or finding.get("type") or finding.get("category") or ""
     )
 
 

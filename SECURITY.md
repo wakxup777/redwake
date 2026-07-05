@@ -2,120 +2,110 @@
 
 ## Reporting a Vulnerability
 
-RedWake Security Labs takes security vulnerabilities seriously. If you discover a security issue in RedWake:
+RedWake açıq mənbə bir layihədir və təhlükəsizlik zəifliklərini ciddi qəbul edir. Hər hansı bir təhlükəsizlik məsələsi aşkar etsəniz:
 
 **Email:** security@redwake.rf.gd
-**PGP key:** (request via email)
-**Subject line:** `[SECURITY] <short description>`
+**PGP key:** (email ilə sorğu edin)
+**Subject line:** `[SECURITY] <qısa təsvir>`
 
-Please **do not** open a public GitHub issue for security vulnerabilities.
+Zəhmət olmasa **public GitHub issue açmayın** təhlükəsizlik zəiflikləri üçün.
 
-### What to include
+### Nə daxil edilməlidir
 
-1. **Description** of the vulnerability
-2. **Steps to reproduce** (be specific)
-3. **Affected versions** (e.g., v1.0.4-redwake.1)
-4. **Impact** assessment (RCE, license bypass, info disclosure, etc.)
-5. **Environment** (OS, Python version, install method)
+1. **Zəifliyin təsviri**
+2. **Addım-addım reproduksiya** (kifayət qədər detallı)
+3. **Təsirə məruz qalan versiyalar** (məs., v1.0.4-redwake.1)
+4. **Impact** qiymətləndirməsi (RCE, info disclosure, və s.)
+5. **Mühit** (OS, Python versiyası, quraşdırma üsulu)
 
-### Response timeline
+### Cavab müddətləri
 
-- **24 hours:** initial acknowledgement
-- **72 hours:** triage and severity classification
-- **7 days:** patch development for high/critical
-- **30 days:** disclosure (coordinated with reporter)
+- **24 saat:** ilkin təsdiq
+- **72 saat:** triage və ciddilik təsnifatı
+- **7 gün:** yüksək/kritik üçün patch inkişafı
+- **30 gün:** açıqlama (reporter ilə əlaqəli şəkildə)
 
-### Scope
+### Əhatə dairəsi
 
-In scope:
-- License enforcement bypass
-- Anti-debug detection bypass
+Əhatə daxilində:
 - Sandbox escape
-- Server-side vulnerabilities (only if you have a test key)
-- Privilege escalation in client
+- Container-dən kənar code execution (host-a)
+- Təsadüfi və ya qəsdən data exfiltration
+- RedWake agent-lərində və ya runtime-da zəifliklər
 
-Out of scope:
-- Vulnerabilities in dependencies (report to respective maintainers)
-- Social engineering
-- Physical attacks
-- Denial of service (the license server is for legitimate users only)
+Əhatə xaricində:
+- Dependency-lərdəki zəifliklər (müvafiq maintainer-lərə report edin)
+- Sosial mühəndislik
+- Fiziki hücumlar
+- DoS (RedWake nüfuzetmə test alətidir — DoS testləri uyğun deyil)
 
-### Bounty program
+### Bounty proqramı
 
-RedWake does not currently offer a monetary bug bounty. However:
-- Public credit in CHANGELOG.md (if desired)
-- Free license extension (1 year per valid report)
-- Direct contact with security team
+RedWake hal-hazırda pullu bug bounty proqramı təklif etmir. Lakin:
+- CHANGELOG.md-da açıq kredit (istək əsasında)
+- Açıq mənbə layihəsi olaraq dərhal fix
 
-## Responsible Use
+## Məsuliyyətli İstifadə
 
-RedWake is a powerful offensive security tool. With great power comes great responsibility.
+RedWake güclü hücum təhlükəsizlik alətidir. Böyük güc böyük məsuliyyət deməkdir.
 
-### ✅ Acceptable use
+### ✅ Məqbul istifadə
 
-- Testing applications **you own** (your company, your side project)
-- Authorized penetration tests with **written scope** (e.g., bug bounty program, red team engagement)
-- Security research on **dedicated lab environments** (DVWA, HackTheBox, VulnHub, your own VMs)
-- CTF competitions
-- Academic research (with appropriate IRB approval)
+- **Sahib olduğunuz** tətbiqlərin test edilməsi (şirkətiniz, layihəniz)
+- **Yazılı səlahiyyətlə** səlahiyyətli penetration testləri (məs., bug bounty proqramı, red team işi)
+- **Ayrılmış lab mühitlərində** təhlükəsizlik tədqiqatları (DVWA, HackTheBox, VulnHub, öz VM-ləriniz)
+- CTF yarışları
+- Akademik tədqiqat (müvafiq IRB təsdiqi ilə)
 
-### ❌ Prohibited use
+### ❌ Qadağan edilmiş istifadə
 
-- Scanning systems without **explicit written permission**
-- Targeting critical infrastructure (healthcare, energy, transportation)
-- DDoS / availability attacks
-- Extortion (ransomware-style threats)
-- Any activity that violates local, national, or international law
+- **Açıq yazılı icazə olmadan** sistemləri skan etmək
+- Kritik infrastruktura hücum (səhiyyə, enerji, nəqliyyat)
+- DDoS / availability hücumları
+- Şantaj (ransomware tipli təhdidlər)
+- Lokal, milli və ya beynəlxalq qanunu pozan hər hansı fəaliyyət
 
-### Legal framework
+### Hüquqi çərçivə
 
-RedWake is provided under Apache 2.0. The license includes:
+RedWake Apache 2.0 lisenziyası altında təqdim olunur. Lisenziyaya aşağıdakılar daxildir:
 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND...
+> SOFTWARE "AS IS" ƏSASINDA, HƏR HANSI BİR ZƏMANƏT OLMAQDAN TƏQDİM EDİLİR...
 
-You are **solely responsible** for ensuring your use of RedWake complies with all applicable laws and regulations.
+Siz RedWake-dən istifadənizin bütün tətbiq olunan qanun və qaydalara uyğun olmasını təmin etməkdə **tam məsuliyyət daşıyırsınız**.
 
 ## Threat Model
 
-RedWake protects against:
-- Casual reverse engineering of the binary
-- License key sharing across multiple machines
-- Unauthorized mass deployment
-- Simple debugging (gdb, strace)
+RedWake qoruyur:
+- Default sandbox izolyasiyası
+- Container sərhədləri (escape olmadıqda)
+- Şəbəkə namespace izolyasiyası (NET_ADMIN cap ilə)
 
-RedWake does **NOT** protect against:
-- Nation-state actors
-- Sophisticated reverse engineers (2+ weeks dedicated effort)
-- Insider threats (someone with admin access to your VPS)
-- Physical access to your machine
-- Your machine being rooted
+RedWake **QORUMUR**:
+- Dövlət səviyyəli aktyorlardan
+- Təcrübəli reverse engineer-lərdən
+- İnsider təhdidlərdən (sizin VPS-ə admin girişi olan şəxsdən)
+- Maşınınıza fiziki girişdən
+- Maşınınızın rootlanmasından
 
-## Cryptography
+## Kriptografiya
 
-RedWake uses:
-- **Ed25519** for license JWT signatures
-- **XOR obfuscation** for endpoint URLs and public keys (not cryptographic — defense in depth)
-- **TLS** for all server communication (when behind HTTPS reverse proxy)
+RedWake istifadə edir:
+- **TLS** bütün xarici LLM endpoint iletişimi üçün
+- **Docker content trust** sandbox image-ləri üçün (konfiqurasiya olduqda)
 
-## Data handling
+## Data emalı
 
-What RedWake sends to the license server:
-- License key (for verification)
-- Heartbeat every 60s: scan_id, action (e.g., "scan_running")
+RedWake LLM endpoint-ə göndərir:
+- Sorğu konteksti (scan hədəfi, tapılmış zəifliklər, exploit cəhdləri)
 
-What the license server stores:
-- License keys and their metadata (issue date, expiry, revocation status)
-- Heartbeat events (last 30 days, then pruned)
-- Audit log (last 90 days, then pruned)
+RedWake LLM endpoint-ə **GÖNDƏRMİR**:
+- Sizin API açarlarınız
+- Şəxsi fayllarınız
+- Autentifikasiya token-ləriniz
 
-What RedWake does **NOT** send:
-- Target URLs
-- Scan results
-- Your files or local data
+## Əlaqə
 
-## Contact
-
-- **General:** hi@redwake.rf.gd
-- **Security:** security@redwake.rf.gd
-- **License support:** admin ilə birbaşa (key verən şəxs)
-- **Website:** https://redwake.rf.gd
+- **Ümumi:** hi@redwake.rf.gd
+- **Təhlükəsizlik:** security@redwake.rf.gd
+- **Veb sayt:** https://redwake.rf.gd
+- **GitHub Issues:** https://github.com/wakxup777/redwake/issues

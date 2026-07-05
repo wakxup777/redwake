@@ -62,7 +62,7 @@ Skills focus on deep, specialized knowledge to significantly enhance agent capab
 
 ## 🤝 Contributing
 
-Community contributions are more than welcome — contribute new skills via [pull requests](https://github.com/redwake/redwake/pulls) or [GitHub issues](https://github.com/redwake/redwake/issues) to help expand the collection and improve extensibility for RedWake agents.
+Community contributions are more than welcome — contribute new skills via [pull requests](https://github.com/wakxup777/redwake/pulls) or [GitHub issues](https://github.com/wakxup777/redwake/issues) to help expand the collection and improve extensibility for RedWake agents.
 
 ---
 

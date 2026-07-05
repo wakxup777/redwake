@@ -40,11 +40,10 @@ try:
         Table,
         TableStyle,
     )
+
     REPORTLAB_AVAILABLE = True
 except ImportError as _exc:
-    logger.warning(
-        "reportlab not installed — PDF report generation disabled: %s", _exc
-    )
+    logger.warning("reportlab not installed — PDF report generation disabled: %s", _exc)
     REPORTLAB_AVAILABLE = False
     # Provide Any stubs so type-checkers / other tools don't choke.
     colors = None  # type: ignore[assignment]
@@ -73,8 +72,7 @@ def write_pdf_report(
     """
     if not REPORTLAB_AVAILABLE:
         raise RuntimeError(
-            "reportlab not installed — cannot generate PDF. "
-            "Install with: uv pip install reportlab"
+            "reportlab not installed — cannot generate PDF. Install with: uv pip install reportlab"
         )
 
     output_path = Path(output_path)
@@ -135,14 +133,16 @@ def write_pdf_report(
         for i, f in enumerate(findings, 1):
             compliance = f.get("compliance") or {}
             title = (f.get("title") or f.get("vulnerability_type") or "")[:50]
-            table_data.append([
-                str(i),
-                _severity_label(f.get("severity")),
-                Paragraph(title, body),
-                Paragraph(_short_url(f.get("url")), body),
-                compliance.get("cwe", "") or "",
-                compliance.get("owasp_top_10", "") or "",
-            ])
+            table_data.append(
+                [
+                    str(i),
+                    _severity_label(f.get("severity")),
+                    Paragraph(title, body),
+                    Paragraph(_short_url(f.get("url")), body),
+                    compliance.get("cwe", "") or "",
+                    compliance.get("owasp_top_10", "") or "",
+                ]
+            )
         table = Table(
             table_data,
             colWidths=[
@@ -195,7 +195,9 @@ def _render_finding_detail(
     story: list[Any] = []
     title = finding.get("title") or finding.get("vulnerability_type") or f"Finding {index}"
     severity = _severity_label(finding.get("severity"))
-    story.append(Paragraph(f"{index}. {title} <font size=10 color='grey'>[{severity}]</font>", h2_style))
+    story.append(
+        Paragraph(f"{index}. {title} <font size=10 color='grey'>[{severity}]</font>", h2_style)
+    )
     story.append(Spacer(1, 4))
 
     compliance = finding.get("compliance") or {}
@@ -232,13 +234,9 @@ def _render_finding_detail(
         story.append(Spacer(1, 6))
         story.append(Paragraph("<b>Compliance</b>", h3_style))
         if pci:
-            story.append(
-                Paragraph(f"<b>PCI-DSS v4:</b> {', '.join(pci)}", body_style)
-            )
+            story.append(Paragraph(f"<b>PCI-DSS v4:</b> {', '.join(pci)}", body_style))
         if nist:
-            story.append(
-                Paragraph(f"<b>NIST 800-53:</b> {', '.join(nist)}", body_style)
-            )
+            story.append(Paragraph(f"<b>NIST 800-53:</b> {', '.join(nist)}", body_style))
 
     return story
 

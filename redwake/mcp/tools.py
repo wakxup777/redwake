@@ -233,11 +233,16 @@ def _audit_target(args: dict[str, Any]) -> dict[str, Any]:
     run_dir.mkdir(parents=True, exist_ok=True)
 
     cmd = [
-        sys.executable, "-m", "redwake.interface.main",
-        "-t", url,
+        sys.executable,
+        "-m",
+        "redwake.interface.main",
+        "-t",
+        url,
         "--non-interactive",
-        "--scan-mode", depth,
-        "--max-budget-usd", str(budget),
+        "--scan-mode",
+        depth,
+        "--max-budget-usd",
+        str(budget),
     ]
     log = run_dir / "redwake.log"
 
@@ -377,12 +382,14 @@ def _list_scans(args: dict[str, Any]) -> dict[str, Any]:
     for p in sorted(_RUNS_DIR.iterdir(), key=lambda x: x.stat().st_mtime, reverse=True):
         if not p.is_dir():
             continue
-        entries.append({
-            "scan_id": p.name,
-            "modified": p.stat().st_mtime,
-            "has_report": (p / "penetration_test_report.md").exists(),
-            "has_sarif": (p / "findings.sarif").exists(),
-        })
+        entries.append(
+            {
+                "scan_id": p.name,
+                "modified": p.stat().st_mtime,
+                "has_report": (p / "penetration_test_report.md").exists(),
+                "has_sarif": (p / "findings.sarif").exists(),
+            }
+        )
         if len(entries) >= limit:
             break
     return {"count": len(entries), "scans": entries}

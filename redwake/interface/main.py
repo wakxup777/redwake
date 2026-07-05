@@ -175,9 +175,9 @@ def validate_environment() -> None:
 
         panel = Panel(
             error_text,
-            title="[bold white]REDWAKE",
-            title_align="left",
-            border_style="red",
+            title="[bold #ef4444]REDWAKE",
+            title_align="right",
+            border_style="#ef4444",
             padding=(1, 2),
         )
 
@@ -206,9 +206,9 @@ def check_docker_installed() -> None:
 
         panel = Panel(
             error_text,
-            title="[bold white]REDWAKE",
-            title_align="left",
-            border_style="red",
+            title="[bold #ef4444]REDWAKE",
+            title_align="right",
+            border_style="#ef4444",
             padding=(1, 2),
         )
         console.print("\n", panel, "\n")
@@ -249,8 +249,8 @@ async def warm_up_llm() -> None:
             console.print(
                 Panel(
                     warn_text,
-                    title="[bold white]REDWAKE",
-                    title_align="left",
+                    title="[bold #ef4444]REDWAKE",
+                    title_align="right",
                     border_style="yellow",
                     padding=(1, 2),
                 ),
@@ -286,9 +286,9 @@ async def warm_up_llm() -> None:
 
         panel = Panel(
             error_text,
-            title="[bold white]REDWAKE",
-            title_align="left",
-            border_style="red",
+            title="[bold #ef4444]REDWAKE",
+            title_align="right",
+            border_style="#ef4444",
             padding=(1, 2),
         )
 
@@ -313,6 +313,7 @@ def _positive_budget(value: str) -> float:
     except ValueError as exc:
         raise argparse.ArgumentTypeError(f"invalid float value: {value!r}") from exc
     import math
+
     if not math.isfinite(budget) or budget <= 0:
         raise argparse.ArgumentTypeError("must be a finite number greater than 0")
     return budget
@@ -729,8 +730,8 @@ def display_completion_message(args: argparse.Namespace, results_path: Path) -> 
 
     panel = Panel(
         panel_content,
-        title="[bold white]REDWAKE",
-        title_align="left",
+        title="[bold #ef4444]REDWAKE",
+        title_align="right",
         border_style=border_style,
         padding=(1, 2),
     )
@@ -781,9 +782,9 @@ def pull_docker_image() -> None:
 
             panel = Panel(
                 error_text,
-                title="[bold white]REDWAKE",
-                title_align="left",
-                border_style="red",
+                title="[bold #ef4444]REDWAKE",
+                title_align="right",
+                border_style="#ef4444",
                 padding=(1, 2),
             )
             console.print(panel, "\n")
@@ -807,12 +808,17 @@ def main() -> None:
     # MCP server mode: start JSON-RPC server in a fresh subprocess and exit.
     if args.mcp_serve:
         import subprocess
+
         # Launched as subprocess so the MCP server runs in a clean Python
         # interpreter (without scan-loop state, telemetry hooks, etc.).
         cmd = [
-            sys.executable, "-m", "redwake.mcp.server",
-            "--host", args.mcp_host,
-            "--port", str(args.mcp_port),
+            sys.executable,
+            "-m",
+            "redwake.mcp.server",
+            "--host",
+            args.mcp_host,
+            "--port",
+            str(args.mcp_port),
         ]
         if args.mcp_auth_token or os.environ.get("REDWAKE_MCP_TOKEN"):
             cmd += ["--auth-token", args.mcp_auth_token or os.environ["REDWAKE_MCP_TOKEN"]]
@@ -869,9 +875,9 @@ def main() -> None:
 
             panel = Panel(
                 error_text,
-                title="[bold white]REDWAKE",
-                title_align="left",
-                border_style="red",
+                title="[bold #ef4444]REDWAKE",
+                title_align="right",
+                border_style="#ef4444",
                 padding=(1, 2),
             )
             console.print("\n")

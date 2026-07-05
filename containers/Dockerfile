@@ -2,7 +2,7 @@ FROM docker.io/wakxup777/redwake-sandbox:1.0.0
 
 LABEL org.opencontainers.image.title="redwake-sandbox"
 LABEL org.opencontainers.image.description="RedWake - AI Penetration Testing Environment"
-LABEL org.opencontainers.image.source="https://github.com/redwake/redwake"
+LABEL org.opencontainers.image.source="https://github.com/wakxup777/redwake"
 LABEL org.opencontainers.image.vendor="RedWake Security Labs"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 

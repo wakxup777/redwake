@@ -345,7 +345,6 @@ def _build_rule(rule_id: str, report: dict[str, Any]) -> dict[str, Any]:
 
     rule["properties"] = properties
 
-
     help_uri = _help_uri_for(rule_id)
     if help_uri:
         rule["helpUri"] = help_uri

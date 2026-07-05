@@ -1,6 +1,6 @@
 # Getting Started — 5 dəqiqəyə RedWake
 
-Bu guide sənə **license key** verildikdən sonra ilk scan-i 5 dəqiqə ərzində başlamağa kömək edəcək.
+Bu guide sənə ilk scan-i 5 dəqiqə ərzində başlamağa kömək edəcək. RedWake tamamilə open source-dur — heç bir license tələb etmir.
 
 ---
 
@@ -16,7 +16,7 @@ Bu guide sənə **license key** verildikdən sonra ilk scan-i 5 dəqiqə ərzind
 ## 2. Repo klonla
 
 ```bash
-git clone https://github.com/redwake/redwake.git
+git clone https://github.com/wakxup777/redwake.git
 cd redwake
 ```
 
@@ -32,19 +32,7 @@ Bu skript:
 - `redwake` binary-ni `~/.local/bin/`-ə qoyur
 - `~/.bashrc` və ya `~/.zshrc`-ə PATH əlavə edir
 
-## 4. License key-i aktivləşdir
-
-
-```bash
-```
-
-**Davamlı etmək üçün** `~/.bashrc` və ya `~/.zshrc`-ə əlavə et:
-
-```bash
-source ~/.zshrc
-```
-
-## 5. LLM API tənzimləmələri
+## 4. LLM API tənzimləmələri
 
 OpenAI-compatible endpoint üçün (OpenAI, Anthropic proxy, local LLM):
 
@@ -56,7 +44,7 @@ export REDWAKE_BASE_URL='https://api.openai.com/v1'   # və ya proxy URL
 
 OpenAI istifadə edirsənsə, `REDWAKE_BASE_URL` opsionaldır (default OpenAI-a gedir). Proxy və ya custom endpoint üçün mütləqdir.
 
-## 6. İlk scan
+## 5. İlk scan
 
 Test üçün təhlükəsiz target:
 ```bash
@@ -68,7 +56,7 @@ Real target üçün yalnız **öz sahibliyində və ya yazılı icazəli sisteml
 redwake -t https://your-target.com --non-interactive --scan-mode deep
 ```
 
-## 7. Nəticə
+## 6. Nəticə
 
 Scan bitəndə:
 - `penetration_test_report.md` — oxu

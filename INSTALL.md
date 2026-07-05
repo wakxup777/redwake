@@ -5,7 +5,7 @@ RedWake-i hər yerdə quraşdırmaq üçün tam təlimat.
 ## Ən sürətli yol (Linux/macOS/WSL2)
 
 ```bash
-git clone https://github.com/redwake/redwake.git
+git clone https://github.com/wakxup777/redwake.git
 cd redwake && ./install.sh
 ```
 
@@ -32,7 +32,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.local/bin/env
 
 # RedWake
-git clone https://github.com/redwake/redwake.git
+git clone https://github.com/wakxup777/redwake.git
 cd redwake
 uv sync
 uv run pyinstaller --clean redwake.spec
@@ -52,7 +52,7 @@ sudo usermod -aG docker $USER
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.local/bin/env
 
-git clone https://github.com/redwake/redwake.git && cd redwake
+git clone https://github.com/wakxup777/redwake.git && cd redwake
 uv sync && uv run pyinstaller --clean redwake.spec
 cp dist/redwake ~/.local/bin/
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
@@ -69,7 +69,7 @@ sudo usermod -aG docker $USER
 # uv (AUR-dan)
 yay -S uv
 
-git clone https://github.com/redwake/redwake.git && cd redwake
+git clone https://github.com/wakxup777/redwake.git && cd redwake
 uv sync && uv run pyinstaller --clean redwake.spec
 cp dist/redwake ~/.local/bin/
 ```
@@ -84,7 +84,7 @@ sudo service docker start
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.local/bin/env
 
-git clone https://github.com/redwake/redwake.git && cd redwake
+git clone https://github.com/wakxup777/redwake.git && cd redwake
 uv sync && uv run pyinstaller --clean redwake.spec
 cp dist/redwake ~/.local/bin/
 ```
@@ -99,7 +99,7 @@ cp dist/redwake ~/.local/bin/
 brew install docker  # Docker Desktop da lazımdır (brew cask install --cask docker)
 brew install uv
 
-git clone https://github.com/redwake/redwake.git && cd redwake
+git clone https://github.com/wakxup777/redwake.git && cd redwake
 uv sync && uv run pyinstaller --clean redwake.spec
 cp dist/redwake ~/.local/bin/   # və ya: cp dist/redwake /usr/local/bin/
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
@@ -113,11 +113,11 @@ source ~/.zshrc
 GitHub Releases-dən yüklə:
 ```bash
 # Intel Mac
-curl -L https://github.com/redwake/redwake/releases/latest/download/redwake-darwin-x86_64 -o ~/.local/bin/redwake
+curl -L https://github.com/wakxup777/redwake/releases/latest/download/redwake-darwin-x86_64 -o ~/.local/bin/redwake
 chmod +x ~/.local/bin/redwake
 
 # Apple Silicon
-curl -L https://github.com/redwake/redwake/releases/latest/download/redwake-darwin-arm64 -o ~/.local/bin/redwake
+curl -L https://github.com/wakxup777/redwake/releases/latest/download/redwake-darwin-arm64 -o ~/.local/bin/redwake
 chmod +x ~/.local/bin/redwake
 ```
 
@@ -146,7 +146,7 @@ Native Windows build işləyir, amma Docker Desktop Windows üçün WSL2 backend
 3. **Git:** https://git-scm.com/download/win
 4. **PowerShell:**
    ```powershell
-   git clone https://github.com/redwake/redwake.git
+   git clone https://github.com/wakxup777/redwake.git
    cd redwake
    uv sync
    uv run pyinstaller --clean redwake.spec
@@ -176,7 +176,7 @@ docker run --rm -it \
 ## From source (developer)
 
 ```bash
-git clone https://github.com/redwake/redwake.git
+git clone https://github.com/wakxup777/redwake.git
 cd redwake
 
 # Dev asılılıqlar (pytest, mypy, ruff, pyinstaller)
@@ -212,7 +212,7 @@ CI/CD-nin yaratdığı binary-lər GitHub Releases-dədir:
 
 **SHA256SUMS** hər release-də var. Yoxlama:
 ```bash
-curl -L https://github.com/redwake/redwake/releases/latest/download/SHA256SUMS | sha256sum -c -
+curl -L https://github.com/wakxup777/redwake/releases/latest/download/SHA256SUMS | sha256sum -c -
 ```
 
 ---

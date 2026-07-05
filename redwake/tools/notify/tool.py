@@ -61,9 +61,7 @@ def _do_notify(url: str, message: str, severity: str = "info") -> dict[str, Any]
         return {"success": False, "error": f"{type(exc).__name__}: {exc}"}
 
     if r.status_code >= 400:
-        logger.warning(
-            "notify_webhook %s returned HTTP %d: %s", url, r.status_code, r.text[:200]
-        )
+        logger.warning("notify_webhook %s returned HTTP %d: %s", url, r.status_code, r.text[:200])
         return {
             "success": False,
             "error": f"HTTP {r.status_code}: {r.text[:200]}",

@@ -49,9 +49,7 @@ def _build_summary_message(exit_reason: str, snapshot: tuple[str, int, dict[str,
         f"*Vulnerabilities:* {n_vulns} total",
     ]
     if any(sev_counts.values()):
-        breakdown = ", ".join(
-            f"{k}: {v}" for k, v in sev_counts.items() if v
-        )
+        breakdown = ", ".join(f"{k}: {v}" for k, v in sev_counts.items() if v)
         lines.append(f"*Breakdown:* {breakdown}")
     lines.append(f"*Run ID:* `{scan_id}`")
     return "\n".join(lines)

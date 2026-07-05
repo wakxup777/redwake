@@ -2,7 +2,7 @@
 
 To help make RedWake better for everyone, we collect anonymized data that helps us understand how to better improve our AI security agent for our users, guide the addition of new features, and fix common errors and bugs. This feedback loop is crucial for improving RedWake's capabilities and user experience.
 
-We use [PostHog](https://posthog.com), an open-source analytics platform, for data collection and analysis. Our telemetry implementation is fully transparent - you can review the [source code](https://github.com/redwake/redwake/blob/main/redwake/telemetry/posthog.py) to see exactly what we track.
+We use [PostHog](https://posthog.com), an open-source analytics platform, for data collection and analysis. Our telemetry implementation is fully transparent - you can review the [source code](https://github.com/wakxup777/redwake/blob/main/redwake/telemetry/posthog.py) to see exactly what we track.
 
 ### Telemetry Policy
 

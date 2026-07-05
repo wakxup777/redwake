@@ -31,7 +31,7 @@ Configure RedWake using environment variables or a config file.
   Control thinking effort for reasoning models. Valid values: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`. Defaults to `medium` for quick scan mode.
 </ParamField>
 
-<ParamField path="STRIX_MEMORY_COMPRESSOR_TIMEOUT" default="30" type="integer">
+<ParamField path="REDWAKE_MEMORY_COMPRESSOR_TIMEOUT" default="30" type="integer">
   Timeout in seconds for memory compression operations (context summarization).
 </ParamField>
 
@@ -60,14 +60,14 @@ Configure RedWake using environment variables or a config file.
 When remote OTEL vars are not set, RedWake still writes complete run telemetry locally to:
 
 ```bash
-strix_runs/<run_name>/events.jsonl
+redwake_runs/<run_name>/events.jsonl
 ```
 
 When remote vars are set, RedWake dual-writes telemetry to both local JSONL and the remote OTEL endpoint.
 
 ## Docker Configuration
 
-<ParamField path="REDWAKE_IMAGE" default="ghcr.io/usestrix/redwake-sandbox:1.0.0" type="string">
+<ParamField path="REDWAKE_IMAGE" default="docker.io/wakxup777/redwake-sandbox:1.0.0" type="string">
   Docker image to use for the sandbox container.
 </ParamField>
 
@@ -85,11 +85,11 @@ When remote vars are set, RedWake dual-writes telemetry to both local JSONL and 
 
 ## Sandbox Configuration
 
-<ParamField path="STRIX_SANDBOX_EXECUTION_TIMEOUT" default="120" type="integer">
+<ParamField path="REDWAKE_SANDBOX_EXECUTION_TIMEOUT" default="120" type="integer">
   Maximum execution time in seconds for sandbox operations.
 </ParamField>
 
-<ParamField path="STRIX_SANDBOX_CONNECT_TIMEOUT" default="10" type="integer">
+<ParamField path="REDWAKE_SANDBOX_CONNECT_TIMEOUT" default="10" type="integer">
   Timeout in seconds for connecting to the sandbox container.
 </ParamField>
 
@@ -125,6 +125,6 @@ export PERPLEXITY_API_KEY="pplx-..."
 
 # Optional: Custom timeouts
 export LLM_TIMEOUT="600"
-export STRIX_SANDBOX_EXECUTION_TIMEOUT="300"
+export REDWAKE_SANDBOX_EXECUTION_TIMEOUT="300"
 
 ```

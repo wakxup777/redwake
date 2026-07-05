@@ -1420,7 +1420,7 @@ def clone_repository(repo_url: str, run_name: str, dest_name: str | None = None)
             error_text,
             title="[bold white]REDWAKE",
             title_align="left",
-            border_style="red",
+            border_style="#ef4444",
             padding=(1, 2),
         )
         console.print("\n")
@@ -1438,7 +1438,7 @@ def clone_repository(repo_url: str, run_name: str, dest_name: str | None = None)
             error_text,
             title="[bold white]REDWAKE",
             title_align="left",
-            border_style="red",
+            border_style="#ef4444",
             padding=(1, 2),
         )
         console.print("\n")
@@ -1466,7 +1466,7 @@ def check_docker_connection() -> Any:
             error_text,
             title="[bold white]REDWAKE",
             title_align="left",
-            border_style="red",
+            border_style="#ef4444",
             padding=(1, 2),
         )
         console.print("\n", panel, "\n")

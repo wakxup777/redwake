@@ -16,7 +16,7 @@ RedWake, **RedWake Security Labs** tərəfindən hazırlanmış açıq mənbəli
 
 **1. Repo klonla:**
 ```bash
-git clone https://github.com/redwake/redwake.git
+git clone https://github.com/wakxup777/redwake.git
 cd redwake
 ```
 
@@ -337,7 +337,7 @@ PR-lar qəbul edilir. Töhfə üçün [CONTRIBUTING.md](CONTRIBUTING.md)-ə bax.
 
 - **Docs:** [GETTING_STARTED.md](GETTING_STARTED.md), [USAGE.md](USAGE.md), [TROUBLESHOOTING.md](TROUBLESHOOTING.md), [FAQ.md](FAQ.md)
 - **Təhlükəsizlik:** security@redwake.rf.gd
-- **Issues:** https://github.com/redwake/redwake/issues
+- **Issues:** https://github.com/wakxup777/redwake/issues
 
 ---
 
