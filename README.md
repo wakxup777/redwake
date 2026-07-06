@@ -30,7 +30,7 @@ cd redwake
 
 **2. Avtomatik quraşdırma:**
 ```bash
-./install.sh
+sudo ./install.sh
 ```
 Bu skript Docker + `uv` qurur, binary build edir, sandbox image-i çəkir.
 
