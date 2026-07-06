@@ -34,6 +34,28 @@ sudo ./install.sh
 ```
 Bu skript Docker + `uv` qurur, binary build edir, sandbox image-i çəkir.
 
+**2b. Əl ilə quraşdırma** (`install.sh`-ı çağırmaq istəmirsənsə):
+
+GitHub Release-dən [v1.0.0](https://github.com/wakxup777/redwake/releases/tag/v1.0.0) binary-ni endir:
+
+```bash
+# Variant A — user-local (PATH konfiqurasiyası lazımdır):
+mkdir -p ~/.local/bin
+wget -O ~/.local/bin/redwake https://github.com/wakxup777/redwake/releases/download/v1.0.0/redwake-1.0.0-linux-x86_64
+chmod +x ~/.local/bin/redwake
+
+# Sonra hər yeni terminalda işləsin:
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Variant B — system-wide (heç bir PATH konfiqurasiyası lazım deyil):
+sudo wget -O /usr/local/bin/redwake https://github.com/wakxup777/redwake/releases/download/v1.0.0/redwake-1.0.0-linux-x86_64
+sudo chmod +x /usr/local/bin/redwake
+
+# Yoxla:
+redwake --version    # → redwake 1.0.0
+```
+
 **3. LLM endpoint tənzimləmələri:**
 ```bash
 export REDWAKE_LLM='gpt-4o'
