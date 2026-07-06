@@ -71,7 +71,9 @@ def _copy_to_clipboard_native(text: str) -> bool:
     env = dict(os.environ)
     for _tool_name, cmd in candidates:
         try:
-            proc = subprocess.run(
+            # cmd is a hardcoded list from shutil.which()-validated tools
+            # (xclip / xsel / wl-copy), never user input.
+            proc = subprocess.run(  # noqa: S603
                 cmd,
                 input=text.encode("utf-8"),
                 timeout=5,
@@ -84,12 +86,12 @@ def _copy_to_clipboard_native(text: str) -> bool:
             continue
 
     # Last-resort: write to a file the user can read manually.
+    fallback = Path.home() / f".redwake_clipboard_{os.getpid()}"
     try:
-        fallback = Path.home() / f".redwake_clipboard_{os.getpid()}"
         fallback.write_text(text, encoding="utf-8")
-        return True
     except OSError:
         return False
+    return True
 
 
 def get_package_version() -> str:
@@ -612,10 +614,8 @@ class VulnerabilityDetailScreen(ModalScreen):  # type: ignore[misc]
             ok = _copy_to_clipboard_native(markdown_text)
             if not ok:
                 # Textual's built-in may still work in some environments.
-                try:
+                with contextlib.suppress(Exception):
                     self.app.copy_to_clipboard(markdown_text)
-                except Exception:
-                    pass
 
             copy_button = self.query_one("#copy_vuln_detail", Button)
             copy_button.label = "Copied!" if ok else "Copy failed"

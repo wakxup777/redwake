@@ -49,14 +49,34 @@ def _format_todo_lines(text: Text, result: dict[str, Any]) -> None:
             text.append(title)
 
 
+def _should_suppress_empty(result: Any) -> bool:
+    """True if the tool returned success=True but no items were created/updated.
+
+    For create_todo, update_todo, mark_*_done/pending, delete_todo: when
+    the call succeeds with created_count=0 (or no items touched), the
+    renderer should return None so the chat history stays clean.
+    """
+    if not isinstance(result, dict):
+        return False
+    if not result.get("success"):
+        return False
+    created_zero = result.get("created_count") is not None and result["created_count"] == 0
+    updated_zero = result.get("updated_count") is not None and result["updated_count"] == 0
+    return created_zero or updated_zero
+
+
 @register_tool_renderer
 class CreateTodoRenderer(BaseToolRenderer):
     tool_name: ClassVar[str] = "create_todo"
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static:
+    def render(cls, tool_data: dict[str, Any]) -> Static | None:
         result = tool_data.get("result")
+
+        if _should_suppress_empty(result):
+            # Successful call but no todos created -> render nothing.
+            return None
 
         text = Text()
         text.append("📋 ")
@@ -117,8 +137,11 @@ class UpdateTodoRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static:
+    def render(cls, tool_data: dict[str, Any]) -> Static | None:
         result = tool_data.get("result")
+
+        if _should_suppress_empty(result):
+            return None
 
         text = Text()
         text.append("📋 ")
@@ -148,8 +171,11 @@ class MarkTodoDoneRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static:
+    def render(cls, tool_data: dict[str, Any]) -> Static | None:
         result = tool_data.get("result")
+
+        if _should_suppress_empty(result):
+            return None
 
         text = Text()
         text.append("📋 ")
@@ -179,8 +205,11 @@ class MarkTodoPendingRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static:
+    def render(cls, tool_data: dict[str, Any]) -> Static | None:
         result = tool_data.get("result")
+
+        if _should_suppress_empty(result):
+            return None
 
         text = Text()
         text.append("📋 ")
@@ -210,8 +239,11 @@ class DeleteTodoRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static:
+    def render(cls, tool_data: dict[str, Any]) -> Static | None:
         result = tool_data.get("result")
+
+        if _should_suppress_empty(result):
+            return None
 
         text = Text()
         text.append("📋 ")

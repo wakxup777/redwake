@@ -180,7 +180,7 @@ def _normalize_bulk_updates(raw_updates: Any) -> list[dict[str, Any]]:
     return normalized
 
 
-def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:
+def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:  # noqa: PLR0912
     if raw_todos is None:
         return []
     data: Any = raw_todos

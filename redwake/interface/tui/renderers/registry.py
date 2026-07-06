@@ -30,12 +30,21 @@ def get_tool_renderer(tool_name: str) -> type[BaseToolRenderer] | None:
     return ToolTUIRegistry.get_renderer(tool_name)
 
 
-def render_tool_widget(tool_data: dict[str, Any]) -> Static:
+def render_tool_widget(tool_data: dict[str, Any]) -> Static | None:
+    """Render a tool call widget, or None if the renderer signals 'no UI needed'.
+
+    Renderers may return None to indicate the call was a no-op (e.g. an empty
+    create_todo with no entries). Callers must skip None when mounting widgets
+    into the chat history.
+    """
     tool_name = tool_data.get("tool_name", "")
     renderer = get_tool_renderer(tool_name)
 
     if renderer:
-        return renderer.render(tool_data)
+        result = renderer.render(tool_data)
+        if result is None:
+            return None
+        return result
     return _render_default_tool_widget(tool_data)
 
 
