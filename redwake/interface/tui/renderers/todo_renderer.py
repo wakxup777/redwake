@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import json
 from typing import Any, ClassVar
 
 from rich.text import Text
@@ -14,58 +17,128 @@ STATUS_MARKERS: dict[str, str] = {
 }
 
 
-def _format_todo_lines(text: Text, result: dict[str, Any]) -> None:
+def _extract_arg_titles(args: Any) -> list[str]:  # noqa: PLR0912
+    """Pull titles out of raw LLM-supplied todo arguments.
+
+    The backend may filter entries (e.g. drop empty titles), but the
+    user wants to see what the LLM intended to plan. This reads from
+    the raw args to surface that intent even when the result is empty.
+    """
+    if not isinstance(args, dict):
+        return []
+
+    titles: list[str] = []
+
+    todos = args.get("todos")
+    if isinstance(todos, list):
+        for entry in todos:
+            if isinstance(entry, dict):
+                t = entry.get("title", "")
+                if isinstance(t, str) and t.strip():
+                    titles.append(t.strip())
+            elif isinstance(entry, str) and entry.strip():
+                titles.append(entry.strip())
+    elif isinstance(todos, str):
+        stripped = todos.strip()
+        if stripped:
+            # JSON-stringified list? Try to parse.
+            try:
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    for entry in parsed:
+                        if isinstance(entry, dict):
+                            t = entry.get("title", "")
+                            if isinstance(t, str) and t.strip():
+                                titles.append(t.strip())
+                        elif isinstance(entry, str) and entry.strip():
+                            titles.append(entry.strip())
+                elif isinstance(parsed, dict):
+                    t = parsed.get("title", "")
+                    if isinstance(t, str) and t.strip():
+                        titles.append(t.strip())
+            except (ValueError, TypeError):
+                # Plain text -> one title.
+                titles.append(stripped)
+
+    return titles
+
+
+def _render_one_entry(text: Text, title: str, *, muted: bool = False) -> None:
+    text.append("\n  ")
+    text.append("[ ]", style="dim" if muted else "")
+    text.append(" ")
+    if muted:
+        text.append(title, style="dim italic")
+    else:
+        text.append(title)
+
+
+def _format_todo_lines(text: Text, result: dict[str, Any], args: Any = None) -> None:
     """Append todo list lines to the rendering Text.
 
-    For todos that were created/updated/marked in this call, render the
-    items. For an empty agent (list_todos path), show 'No todos yet'.
+    Priority order:
+    1) Real todos in result["todos"] -> render with status markers.
+    2) LLM passed entries in args but backend filtered them all out
+       (result["created_count"] == 0 with todos empty) -> render the
+       raw LLM intent as dim italic so the user sees the planned plan.
+    3) Otherwise -> '(plan updated, nothing to add)' as a fallback.
+    4) For list_todos on a fresh agent -> 'No todos yet'.
     """
     todos = result.get("todos")
-    if not isinstance(todos, list) or not todos:
-        created_count = result.get("created_count")
-        if created_count is not None:
-            # create/update/mark path returned an empty list. The call was
-            # successful; surface a dim 'plan updated' line so the user
-            # can see the agent did something.
+    if isinstance(todos, list) and todos:
+        for todo in todos:
+            status = todo.get("status", "pending")
+            marker = STATUS_MARKERS.get(status, STATUS_MARKERS["pending"])
+
+            title = todo.get("title", "").strip() or "(untitled)"
+
             text.append("\n  ")
-            text.append("(plan updated, nothing to add)", style="dim italic")
-            return
-        # list_todos on a fresh agent
-        text.append("\n  ")
-        text.append("No todos yet", style="dim italic")
+            text.append(marker)
+            text.append(" ")
+
+            if status == "done":
+                text.append(title, style="dim strike")
+            elif status == "in_progress":
+                text.append(title, style="italic")
+            else:
+                text.append(title)
         return
 
-    for todo in todos:
-        status = todo.get("status", "pending")
-        marker = STATUS_MARKERS.get(status, STATUS_MARKERS["pending"])
+    # Result has no todos. Look at the raw LLM args.
+    created_count = result.get("created_count")
+    if created_count is not None and args is not None:
+        raw_titles = _extract_arg_titles(args)
+        if raw_titles:
+            for title in raw_titles:
+                _render_one_entry(text, title, muted=True)
+            text.append("\n  ")
+            text.append("(filtered by backend)", style="dim italic")
+            return
 
-        title = todo.get("title", "").strip() or "(untitled)"
-
+    if created_count is not None:
         text.append("\n  ")
-        text.append(marker)
-        text.append(" ")
+        text.append("(plan updated, nothing to add)", style="dim italic")
+        return
 
-        if status == "done":
-            text.append(title, style="dim strike")
-        elif status == "in_progress":
-            text.append(title, style="italic")
-        else:
-            text.append(title)
+    # list_todos on a fresh agent
+    text.append("\n  ")
+    text.append("No todos yet", style="dim italic")
 
 
 def _render_create_or_update(
     title: str,
     title_style: str,
-    result: Any,
+    tool_data: dict[str, Any],
     error_default: str,
     pending_label: str,
-) -> Static | None:
+) -> Static:
     """Common render path for CreateTodo / UpdateTodo.
 
-    Returns None ONLY when the backend reported a hard failure with no
-    result payload (rare). Otherwise always returns a Static so the user
-    can see every planning step in chat history.
+    Always renders a Static so the user can see every planning step.
     """
+    result = tool_data.get("result")
+    args = tool_data.get("args")
+
     text = Text()
     text.append("📋 ")
     text.append(title, style=f"bold {title_style}")
@@ -75,14 +148,11 @@ def _render_create_or_update(
         text.append(result.strip(), style="dim")
     elif isinstance(result, dict):
         if result.get("success"):
-            _format_todo_lines(text, result)
+            _format_todo_lines(text, result, args=args)
         else:
             error = result.get("error", error_default)
             text.append("\n  ")
             text.append(error, style="#ef4444")
-    elif result is None:
-        text.append("\n  ")
-        text.append(pending_label, style="dim")
     else:
         text.append("\n  ")
         text.append(pending_label, style="dim")
@@ -97,11 +167,11 @@ class CreateTodoRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static | None:
+    def render(cls, tool_data: dict[str, Any]) -> Static:
         return _render_create_or_update(
             title="Todo",
             title_style="#a78bfa",
-            result=tool_data.get("result"),
+            tool_data=tool_data,
             error_default="Failed to create todo",
             pending_label="Creating...",
         )
@@ -144,11 +214,11 @@ class UpdateTodoRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static | None:
+    def render(cls, tool_data: dict[str, Any]) -> Static:
         return _render_create_or_update(
             title="Todo Updated",
             title_style="#a78bfa",
-            result=tool_data.get("result"),
+            tool_data=tool_data,
             error_default="Failed to update todo",
             pending_label="Updating...",
         )
@@ -160,11 +230,11 @@ class MarkTodoDoneRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static | None:
+    def render(cls, tool_data: dict[str, Any]) -> Static:
         return _render_create_or_update(
             title="Todo Completed",
             title_style="#a78bfa",
-            result=tool_data.get("result"),
+            tool_data=tool_data,
             error_default="Failed to mark todo done",
             pending_label="Marking done...",
         )
@@ -176,11 +246,11 @@ class MarkTodoPendingRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static | None:
+    def render(cls, tool_data: dict[str, Any]) -> Static:
         return _render_create_or_update(
             title="Todo Reopened",
             title_style="#f59e0b",
-            result=tool_data.get("result"),
+            tool_data=tool_data,
             error_default="Failed to reopen todo",
             pending_label="Reopening...",
         )
@@ -192,11 +262,12 @@ class DeleteTodoRenderer(BaseToolRenderer):
     css_classes: ClassVar[list[str]] = ["tool-call", "todo-tool"]
 
     @classmethod
-    def render(cls, tool_data: dict[str, Any]) -> Static | None:
+    def render(cls, tool_data: dict[str, Any]) -> Static:
         return _render_create_or_update(
             title="Todo Removed",
             title_style="#94a3b8",
-            result=tool_data.get("result"),
+            tool_data=tool_data,
             error_default="Failed to remove todo",
             pending_label="Removing...",
         )
+
