@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # RedWake installer — Linux/macOS/WSL2
 # Detects OS, ensures Docker + uv, builds binary, adds to PATH
+mkdir -p ~/.local/bin
+wget -O ~/.local/bin/redwake https://github.com/wakxup777/redwake/releases/download/v1.0.0/redwake-1.0.0-linux-x86_64
+chmod +x ~/.local/bin/redwake
 
 set -euo pipefail
 
