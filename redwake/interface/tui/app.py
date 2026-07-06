@@ -3,7 +3,10 @@ import asyncio
 import atexit
 import contextlib
 import logging
+import os
+import shutil
 import signal
+import subprocess
 import sys
 import threading
 from collections.abc import Callable
@@ -44,6 +47,49 @@ from redwake.runtime import session_manager
 
 
 logger = logging.getLogger(__name__)
+
+
+def _copy_to_clipboard_native(text: str) -> bool:
+    """Copy text to X11/Wayland clipboard via xclip / xsel / wl-copy.
+
+    Falls back to writing to ~/.redwake_clipboard_<pid> when no clipboard
+    tool is available or subprocess fails (e.g. text editor broke DISPLAY).
+
+    Returns True on success, False on failure.
+    """
+    if not text:
+        return False
+
+    candidates: list[tuple[str, list[str]]] = []
+    if shutil.which("xclip"):
+        candidates.append(("xclip", ["xclip", "-selection", "clipboard"]))
+    if shutil.which("xsel"):
+        candidates.append(("xsel", ["xsel", "--clipboard", "--input"]))
+    if shutil.which("wl-copy"):
+        candidates.append(("wl-copy", ["wl-copy"]))
+
+    env = dict(os.environ)
+    for _tool_name, cmd in candidates:
+        try:
+            proc = subprocess.run(
+                cmd,
+                input=text.encode("utf-8"),
+                timeout=5,
+                check=False,
+                env=env,
+            )
+            if proc.returncode == 0:
+                return True
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+
+    # Last-resort: write to a file the user can read manually.
+    try:
+        fallback = Path.home() / f".redwake_clipboard_{os.getpid()}"
+        fallback.write_text(text, encoding="utf-8")
+        return True
+    except OSError:
+        return False
 
 
 def get_package_version() -> str:
@@ -563,10 +609,16 @@ class VulnerabilityDetailScreen(ModalScreen):  # type: ignore[misc]
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "copy_vuln_detail":
             markdown_text = self._get_markdown_report()
-            self.app.copy_to_clipboard(markdown_text)
+            ok = _copy_to_clipboard_native(markdown_text)
+            if not ok:
+                # Textual's built-in may still work in some environments.
+                try:
+                    self.app.copy_to_clipboard(markdown_text)
+                except Exception:
+                    pass
 
             copy_button = self.query_one("#copy_vuln_detail", Button)
-            copy_button.label = "Copied!"
+            copy_button.label = "Copied!" if ok else "Copy failed"
             self.set_timer(1.5, lambda: setattr(copy_button, "label", "Copy"))
         elif event.button.id == "close_vuln_detail":
             self.app.pop_screen()
@@ -1834,8 +1886,11 @@ class RedWakeTUIApp(App):  # type: ignore[misc]
                 self.screen.clear_selection()
                 if selected and selected.strip():
                     cleaned = self._clean_copied_text(selected)
-                    self.copy_to_clipboard(cleaned if cleaned.strip() else selected)
-                    copied = True
+                    if _copy_to_clipboard_native(cleaned if cleaned.strip() else selected):
+                        copied = True
+                    else:
+                        self.copy_to_clipboard(cleaned if cleaned.strip() else selected)
+                        copied = True
         except Exception:
             logger.debug("Failed to copy screen selection", exc_info=True)
 
@@ -1844,9 +1899,12 @@ class RedWakeTUIApp(App):  # type: ignore[misc]
                 chat_input = self.query_one("#chat_input", ChatTextArea)
                 selected = chat_input.selected_text
                 if selected and selected.strip():
-                    self.copy_to_clipboard(selected)
+                    if _copy_to_clipboard_native(selected):
+                        copied = True
+                    else:
+                        self.copy_to_clipboard(selected)
+                        copied = True
                     chat_input.move_cursor(chat_input.cursor_location)
-                    copied = True
             except Exception:
                 logger.debug("Failed to copy chat input selection", exc_info=True)
 
