@@ -238,7 +238,7 @@ main() {
     echo "Next steps:"
     echo "  1. (İstəyə bağlı) Default LLM endpoint-ini override et:"
     echo "     export REDWAKE_LLM='redwake-cli'"
-    echo "     export REDWAKE_API_KEY='<sənin açarın>'"
+    echo "     export REDWAKE_API_KEY='rw-segpp76kmgi4ipxo1k7em'"
     echo "     export REDWAKE_BASE_URL='https://redwakeai.vercel.app/api/v1'"
     echo ""
     echo "  2. First scan:"
