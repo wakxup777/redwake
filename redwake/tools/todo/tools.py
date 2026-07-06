@@ -311,10 +311,26 @@ async def create_todo(ctx: RunContextWrapper, todos: Any) -> str:
     """
     agent_id = _agent_id_from(ctx)
     try:
-        tasks = _normalize_bulk_todos(todos)
-        if not tasks:
+        if todos is None:
             return json.dumps(
                 {"success": False, "error": "Provide a non-empty 'todos' list to create"},
+                ensure_ascii=False,
+                default=str,
+            )
+        tasks = _normalize_bulk_todos(todos)
+        if not tasks:
+            # Empty input or all entries were filtered out (e.g. empty titles)
+            # — return success with no created items. The agent can still
+            # proceed with its work; the todo list is just empty.
+            return json.dumps(
+                {
+                    "success": True,
+                    "created": [],
+                    "created_count": 0,
+                    "todos": _sorted_todos(agent_id),
+                    "total_count": len(_get_agent_todos(agent_id)),
+                    "note": "No valid todo entries to create",
+                },
                 ensure_ascii=False,
                 default=str,
             )
