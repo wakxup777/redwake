@@ -17,8 +17,18 @@ STATUS_MARKERS: dict[str, str] = {
 def _format_todo_lines(text: Text, result: dict[str, Any]) -> None:
     todos = result.get("todos")
     if not isinstance(todos, list) or not todos:
+        # Two reasons a todo list can be empty:
+        #  1) created_count=0 with a "note" -> silently skip rendering the
+        #     "No todos" line; the agent's call was successful, just empty.
+        #  2) list_todos on a fresh agent with no todos at all -> show a
+        #     single friendly hint.
+        created_count = result.get("created_count")
+        if created_count is not None:
+            # create_todo / update_todo / mark_* paths. Empty list = success
+            # with no items, don't surface "No todos" as if it were an error.
+            return
         text.append("\n  ")
-        text.append("No todos", style="dim")
+        text.append("No todos yet", style="dim italic")
         return
 
     for todo in todos:
