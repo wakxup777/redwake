@@ -207,10 +207,28 @@ def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:
                 normalized.append({"title": title})
             continue
         if not isinstance(item, dict):
-            raise TypeError("Each todo entry must be a string or object with a title")
+            logger.warning(
+                "Skipping todo entry: expected string or object, got %s", type(item).__name__,
+            )
+            continue
         title = item.get("title", "")
         if not isinstance(title, str) or not title.strip():
-            raise ValueError("Each todo entry must include a non-empty 'title'")
+            # Fall back to description if title is missing/empty.
+            description = item.get("description", "")
+            if isinstance(description, str) and description.strip():
+                normalized.append(
+                    {
+                        "title": description.strip()[:80],
+                        "description": description.strip(),
+                        "priority": item.get("priority"),
+                    },
+                )
+            else:
+                logger.warning(
+                    "Skipping todo entry: missing 'title' and 'description' is empty: %r",
+                    {k: v for k, v in item.items() if k in ("title", "description")},
+                )
+            continue
         normalized.append(
             {
                 "title": title.strip(),
