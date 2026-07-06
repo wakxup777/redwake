@@ -15,18 +15,22 @@ STATUS_MARKERS: dict[str, str] = {
 
 
 def _format_todo_lines(text: Text, result: dict[str, Any]) -> None:
+    """Append todo list lines to the rendering Text.
+
+    For todos that were created/updated/marked in this call, render the
+    items. For an empty agent (list_todos path), show 'No todos yet'.
+    """
     todos = result.get("todos")
     if not isinstance(todos, list) or not todos:
-        # Two reasons a todo list can be empty:
-        #  1) created_count=0 with a "note" -> silently skip rendering the
-        #     "No todos" line; the agent's call was successful, just empty.
-        #  2) list_todos on a fresh agent with no todos at all -> show a
-        #     single friendly hint.
         created_count = result.get("created_count")
         if created_count is not None:
-            # create_todo / update_todo / mark_* paths. Empty list = success
-            # with no items, don't surface "No todos" as if it were an error.
+            # create/update/mark path returned an empty list. The call was
+            # successful; surface a dim 'plan updated' line so the user
+            # can see the agent did something.
+            text.append("\n  ")
+            text.append("(plan updated, nothing to add)", style="dim italic")
             return
+        # list_todos on a fresh agent
         text.append("\n  ")
         text.append("No todos yet", style="dim italic")
         return
@@ -49,20 +53,42 @@ def _format_todo_lines(text: Text, result: dict[str, Any]) -> None:
             text.append(title)
 
 
-def _should_suppress_empty(result: Any) -> bool:
-    """True if the tool returned success=True but no items were created/updated.
+def _render_create_or_update(
+    title: str,
+    title_style: str,
+    result: Any,
+    error_default: str,
+    pending_label: str,
+) -> Static | None:
+    """Common render path for CreateTodo / UpdateTodo.
 
-    For create_todo, update_todo, mark_*_done/pending, delete_todo: when
-    the call succeeds with created_count=0 (or no items touched), the
-    renderer should return None so the chat history stays clean.
+    Returns None ONLY when the backend reported a hard failure with no
+    result payload (rare). Otherwise always returns a Static so the user
+    can see every planning step in chat history.
     """
-    if not isinstance(result, dict):
-        return False
-    if not result.get("success"):
-        return False
-    created_zero = result.get("created_count") is not None and result["created_count"] == 0
-    updated_zero = result.get("updated_count") is not None and result["updated_count"] == 0
-    return created_zero or updated_zero
+    text = Text()
+    text.append("📋 ")
+    text.append(title, style=f"bold {title_style}")
+
+    if isinstance(result, str) and result.strip():
+        text.append("\n  ")
+        text.append(result.strip(), style="dim")
+    elif isinstance(result, dict):
+        if result.get("success"):
+            _format_todo_lines(text, result)
+        else:
+            error = result.get("error", error_default)
+            text.append("\n  ")
+            text.append(error, style="#ef4444")
+    elif result is None:
+        text.append("\n  ")
+        text.append(pending_label, style="dim")
+    else:
+        text.append("\n  ")
+        text.append(pending_label, style="dim")
+
+    css_classes = BaseToolRenderer.get_css_classes("completed")
+    return Static(text, classes=css_classes)
 
 
 @register_tool_renderer
@@ -72,32 +98,13 @@ class CreateTodoRenderer(BaseToolRenderer):
 
     @classmethod
     def render(cls, tool_data: dict[str, Any]) -> Static | None:
-        result = tool_data.get("result")
-
-        if _should_suppress_empty(result):
-            # Successful call but no todos created -> render nothing.
-            return None
-
-        text = Text()
-        text.append("📋 ")
-        text.append("Todo", style="bold #a78bfa")
-
-        if isinstance(result, str) and result.strip():
-            text.append("\n  ")
-            text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
-            if result.get("success"):
-                _format_todo_lines(text, result)
-            else:
-                error = result.get("error", "Failed to create todo")
-                text.append("\n  ")
-                text.append(error, style="#ef4444")
-        else:
-            text.append("\n  ")
-            text.append("Creating...", style="dim")
-
-        css_classes = cls.get_css_classes("completed")
-        return Static(text, classes=css_classes)
+        return _render_create_or_update(
+            title="Todo",
+            title_style="#a78bfa",
+            result=tool_data.get("result"),
+            error_default="Failed to create todo",
+            pending_label="Creating...",
+        )
 
 
 @register_tool_renderer
@@ -116,7 +123,7 @@ class ListTodosRenderer(BaseToolRenderer):
         if isinstance(result, str) and result.strip():
             text.append("\n  ")
             text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
+        elif isinstance(result, dict):
             if result.get("success"):
                 _format_todo_lines(text, result)
             else:
@@ -138,31 +145,13 @@ class UpdateTodoRenderer(BaseToolRenderer):
 
     @classmethod
     def render(cls, tool_data: dict[str, Any]) -> Static | None:
-        result = tool_data.get("result")
-
-        if _should_suppress_empty(result):
-            return None
-
-        text = Text()
-        text.append("📋 ")
-        text.append("Todo Updated", style="bold #a78bfa")
-
-        if isinstance(result, str) and result.strip():
-            text.append("\n  ")
-            text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
-            if result.get("success"):
-                _format_todo_lines(text, result)
-            else:
-                error = result.get("error", "Failed to update todo")
-                text.append("\n  ")
-                text.append(error, style="#ef4444")
-        else:
-            text.append("\n  ")
-            text.append("Updating...", style="dim")
-
-        css_classes = cls.get_css_classes("completed")
-        return Static(text, classes=css_classes)
+        return _render_create_or_update(
+            title="Todo Updated",
+            title_style="#a78bfa",
+            result=tool_data.get("result"),
+            error_default="Failed to update todo",
+            pending_label="Updating...",
+        )
 
 
 @register_tool_renderer
@@ -172,31 +161,13 @@ class MarkTodoDoneRenderer(BaseToolRenderer):
 
     @classmethod
     def render(cls, tool_data: dict[str, Any]) -> Static | None:
-        result = tool_data.get("result")
-
-        if _should_suppress_empty(result):
-            return None
-
-        text = Text()
-        text.append("📋 ")
-        text.append("Todo Completed", style="bold #a78bfa")
-
-        if isinstance(result, str) and result.strip():
-            text.append("\n  ")
-            text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
-            if result.get("success"):
-                _format_todo_lines(text, result)
-            else:
-                error = result.get("error", "Failed to mark todo done")
-                text.append("\n  ")
-                text.append(error, style="#ef4444")
-        else:
-            text.append("\n  ")
-            text.append("Marking done...", style="dim")
-
-        css_classes = cls.get_css_classes("completed")
-        return Static(text, classes=css_classes)
+        return _render_create_or_update(
+            title="Todo Completed",
+            title_style="#a78bfa",
+            result=tool_data.get("result"),
+            error_default="Failed to mark todo done",
+            pending_label="Marking done...",
+        )
 
 
 @register_tool_renderer
@@ -206,31 +177,13 @@ class MarkTodoPendingRenderer(BaseToolRenderer):
 
     @classmethod
     def render(cls, tool_data: dict[str, Any]) -> Static | None:
-        result = tool_data.get("result")
-
-        if _should_suppress_empty(result):
-            return None
-
-        text = Text()
-        text.append("📋 ")
-        text.append("Todo Reopened", style="bold #f59e0b")
-
-        if isinstance(result, str) and result.strip():
-            text.append("\n  ")
-            text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
-            if result.get("success"):
-                _format_todo_lines(text, result)
-            else:
-                error = result.get("error", "Failed to reopen todo")
-                text.append("\n  ")
-                text.append(error, style="#ef4444")
-        else:
-            text.append("\n  ")
-            text.append("Reopening...", style="dim")
-
-        css_classes = cls.get_css_classes("completed")
-        return Static(text, classes=css_classes)
+        return _render_create_or_update(
+            title="Todo Reopened",
+            title_style="#f59e0b",
+            result=tool_data.get("result"),
+            error_default="Failed to reopen todo",
+            pending_label="Reopening...",
+        )
 
 
 @register_tool_renderer
@@ -240,28 +193,10 @@ class DeleteTodoRenderer(BaseToolRenderer):
 
     @classmethod
     def render(cls, tool_data: dict[str, Any]) -> Static | None:
-        result = tool_data.get("result")
-
-        if _should_suppress_empty(result):
-            return None
-
-        text = Text()
-        text.append("📋 ")
-        text.append("Todo Removed", style="bold #94a3b8")
-
-        if isinstance(result, str) and result.strip():
-            text.append("\n  ")
-            text.append(result.strip(), style="dim")
-        elif result and isinstance(result, dict):
-            if result.get("success"):
-                _format_todo_lines(text, result)
-            else:
-                error = result.get("error", "Failed to remove todo")
-                text.append("\n  ")
-                text.append(error, style="#ef4444")
-        else:
-            text.append("\n  ")
-            text.append("Removing...", style="dim")
-
-        css_classes = cls.get_css_classes("completed")
-        return Static(text, classes=css_classes)
+        return _render_create_or_update(
+            title="Todo Removed",
+            title_style="#94a3b8",
+            result=tool_data.get("result"),
+            error_default="Failed to remove todo",
+            pending_label="Removing...",
+        )
