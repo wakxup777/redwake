@@ -137,37 +137,81 @@ build_redwake() {
         err "Build failed — dist/redwake not found"
     fi
 
-    mkdir -p "${INSTALL_DIR}"
-    install -m 0755 "${REPO_DIR}/dist/redwake" "${INSTALL_DIR}/redwake"
-    log "Installed: ${INSTALL_DIR}/redwake"
+    log "Built: ${REPO_DIR}/dist/redwake"
+}
+
+# Install the built binary into one of several target locations.
+# Tries /usr/local/bin first (no PATH config needed), then ~/.local/bin,
+# then ~/bin. The first one that succeeds is used.
+install_binary() {
+    local binary="${REPO_DIR}/dist/redwake"
+    local target=""
+
+    # 1. /usr/local/bin (system-wide, no PATH config)
+    if [[ -w /usr/local/bin ]] || sudo -n true 2>/dev/null; then
+        if sudo -n install -m 0755 "${binary}" /usr/local/bin/redwake 2>/dev/null \
+            || install -m 0755 "${binary}" /usr/local/bin/redwake 2>/dev/null; then
+            target="/usr/local/bin"
+        fi
+    fi
+
+    # 2. ~/.local/bin (user-local, needs PATH config)
+    if [[ -z "${target}" ]]; then
+        mkdir -p "${HOME}/.local/bin"
+        if install -m 0755 "${binary}" "${HOME}/.local/bin/redwake" 2>/dev/null; then
+            target="${HOME}/.local/bin"
+        fi
+    fi
+
+    # 3. ~/bin (legacy fallback)
+    if [[ -z "${target}" ]]; then
+        mkdir -p "${HOME}/bin"
+        if install -m 0755 "${binary}" "${HOME}/bin/redwake" 2>/dev/null; then
+            target="${HOME}/bin"
+        fi
+    fi
+
+    if [[ -z "${target}" ]]; then
+        err "Could not install binary to /usr/local/bin, ~/.local/bin, or ~/bin. Check permissions."
+    fi
+
+    log "Installed: ${target}/redwake"
+    INSTALL_DIR="${target}"
 }
 
 # ── PATH ──
 ensure_path() {
-    case ":${PATH}:" in
-        *":${INSTALL_DIR}:"*) log "PATH already includes ${INSTALL_DIR}" ;;
-        *)
-            warn "${INSTALL_DIR} not in PATH — adding to shell rc"
-            for rc in "${HOME}/.bashrc" "${HOME}/.zshrc"; do
-                if [[ -f "${rc}" ]]; then
-                    if ! grep -q "${INSTALL_DIR}" "${rc}" 2>/dev/null; then
-                        echo "" >> "${rc}"
-                        echo "# Added by RedWake installer" >> "${rc}"
-                        echo "export PATH=\"\${HOME}/.local/bin:\${PATH}\"" >> "${rc}"
-                        log "Updated: ${rc}"
-                    fi
-                fi
-            done
-            export PATH="${INSTALL_DIR}:${PATH}"
-            warn "Restart your shell or run: export PATH=\"${INSTALL_DIR}:\${PATH}\""
-            ;;
-    esac
+    # If the install target is already on PATH (true for /usr/local/bin),
+    # we don't need to touch rc files at all.
+    if command -v redwake >/dev/null 2>&1; then
+        log "redwake on PATH: $(command -v redwake)"
+        return 0
+    fi
+
+    # Otherwise, append to ~/.bashrc and ~/.zshrc so future shells see it.
+    for rc in "${HOME}/.bashrc" "${HOME}/.zshrc"; do
+        [[ -f "${rc}" ]] || continue
+        if ! grep -qF "${INSTALL_DIR}" "${rc}" 2>/dev/null; then
+            echo "" >> "${rc}"
+            echo "# Added by RedWake installer" >> "${rc}"
+            echo "export PATH=\"\${PATH}:${INSTALL_DIR}\"" >> "${rc}"
+            log "Updated: ${rc}"
+        fi
+    done
+
+    # Also export in the current shell so this session works immediately.
+    export PATH="${PATH}:${INSTALL_DIR}"
+    if command -v redwake >/dev/null 2>&1; then
+        log "redwake on PATH (current shell): $(command -v redwake)"
+    else
+        warn "PATH updated, but restart your shell or run: export PATH=\"\${PATH}:${INSTALL_DIR}\""
+    fi
 }
 
 # ── Verify ──
 verify() {
     if ! command -v redwake >/dev/null 2>&1; then
-        err "redwake not in PATH. Try: export PATH=\"${INSTALL_DIR}:\${PATH}\""
+        err "redwake not in PATH. Try: export PATH=\"\${PATH}:${INSTALL_DIR}\""
     fi
     local version
     version=$(redwake --version 2>&1 | head -1)
@@ -183,6 +227,7 @@ main() {
     ensure_docker
     ensure_uv
     build_redwake
+    install_binary
     ensure_sandbox_image
     ensure_path
     verify
@@ -193,7 +238,7 @@ main() {
     echo "Next steps:"
     echo "  1. (İstəyə bağlı) Default LLM endpoint-ini override et:"
     echo "     export REDWAKE_LLM='redwake-cli'"
-    echo "     export OPENAI_API_KEY='rw-segpp76kmgi4ipxo1k7em'"
+    echo "     export REDWAKE_API_KEY='<sənin açarın>'"
     echo "     export REDWAKE_BASE_URL='https://redwakeai.vercel.app/api/v1'"
     echo ""
     echo "  2. First scan:"

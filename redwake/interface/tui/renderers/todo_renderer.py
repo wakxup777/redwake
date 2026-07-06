@@ -270,4 +270,3 @@ class DeleteTodoRenderer(BaseToolRenderer):
             error_default="Failed to remove todo",
             pending_label="Removing...",
         )
-

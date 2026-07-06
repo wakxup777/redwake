@@ -55,6 +55,10 @@ def apply_config_override(path: Path) -> None:
 
 def persist_current() -> None:
     """Write currently-set env vars to the active config file (0o600)."""
+    # Snapshot os.environ *before* load_settings() runs so that side-effects
+    # from model loading (e.g. models.py injecting OPENAI_API_KEY) are not
+    # mistakenly written as if the user explicitly set them.
+    env_snapshot = dict(os.environ)
     s = load_settings()
     target = _override or _DEFAULT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -66,7 +70,7 @@ def persist_current() -> None:
             continue
         for finfo in type(sub_model).model_fields.values():
             for alias in _aliases_for(finfo):
-                value = os.environ.get(alias.upper())
+                value = env_snapshot.get(alias.upper())
                 if value:
                     env_block[alias.upper()] = value
                     break

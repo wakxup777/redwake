@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 
 
 _LLM_ENV_KEYS = [
+    # LlmSettings
     "REDWAKE_LLM",
+    "REDWAKE_API_KEY",
+    "REDWAKE_BASE_URL",
     "LLM_API_KEY",
     "OPENAI_API_KEY",
     "LLM_API_BASE",
@@ -27,6 +30,7 @@ _LLM_ENV_KEYS = [
     "OLLAMA_API_BASE",
     "REDWAKE_REASONING_EFFORT",
     "LLM_TIMEOUT",
+    # IntegrationSettings
     "PERPLEXITY_API_KEY",
     # RuntimeSettings
     "REDWAKE_IMAGE",
@@ -34,6 +38,10 @@ _LLM_ENV_KEYS = [
     "REDWAKE_MAX_LOCAL_COPY_MB",
     # TelemetrySettings
     "REDWAKE_TELEMETRY",
+    # NotifySettings
+    "REDWAKE_WEBHOOK_URL",
+    "REDWAKE_NOTIFY_ON_SCAN_END",
+    "REDWAKE_NOTIFY_TIMEOUT",
 ]
 
 

@@ -181,6 +181,12 @@ def _normalize_bulk_updates(raw_updates: Any) -> list[dict[str, Any]]:
 
 
 def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:  # noqa: PLR0912
+    """Normalize whatever the LLM sent into a list of {title, ...} dicts.
+
+    Bulletproof: any unexpected type (int, bool, None, malformed JSON, etc.)
+    yields an empty list rather than raising. The caller treats empty as
+    'successfully created nothing' so the agent loop never stalls.
+    """
     if raw_todos is None:
         return []
     data: Any = raw_todos
@@ -190,14 +196,22 @@ def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:  # noqa: PLR0
             return []
         try:
             data = json.loads(stripped)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, ValueError):
             entries = [line.strip(" -*\t") for line in stripped.splitlines() if line.strip(" -*\t")]
             return [{"title": entry} for entry in entries]
+    elif isinstance(raw_todos, (int, float, bool)):
+        # LLM sometimes passes the count as a number. Treat as a single
+        # plain-text "todo" so the call still succeeds.
+        return [{"title": f"item {raw_todos!s}"}]
 
     if isinstance(data, dict):
         data = [data]
     if not isinstance(data, list):
-        raise TypeError("Todos must be provided as a list, dict, or JSON string")
+        logger.warning(
+            "Todo input was %s; expected list/dict/string. Returning empty.",
+            type(data).__name__,
+        )
+        return []
 
     normalized: list[dict[str, Any]] = []
     for item in data:
@@ -208,7 +222,8 @@ def _normalize_bulk_todos(raw_todos: Any) -> list[dict[str, Any]]:  # noqa: PLR0
             continue
         if not isinstance(item, dict):
             logger.warning(
-                "Skipping todo entry: expected string or object, got %s", type(item).__name__,
+                "Skipping todo entry: expected string or object, got %s",
+                type(item).__name__,
             )
             continue
         title = item.get("title", "")
@@ -366,6 +381,7 @@ async def create_todo(ctx: RunContextWrapper, todos: Any) -> str:
             "created_count": len(created),
             "todos": _sorted_todos(agent_id),
             "total_count": len(_get_agent_todos(agent_id)),
+            "note": None if created else "No todos created (filtered or empty input)",
         },
         ensure_ascii=False,
         default=str,
@@ -472,7 +488,14 @@ async def update_todo(ctx: RunContextWrapper, updates: Any) -> str:
         updates_to_apply = _normalize_bulk_updates(updates)
         if not updates_to_apply:
             return json.dumps(
-                {"success": False, "error": "Provide a non-empty 'updates' list"},
+                {
+                    "success": True,
+                    "updated": [],
+                    "updated_count": 0,
+                    "todos": _sorted_todos(agent_id),
+                    "total_count": len(agent_todos),
+                    "note": "No updates provided (empty input)",
+                },
                 ensure_ascii=False,
                 default=str,
             )
