@@ -155,6 +155,7 @@ OPERATIONAL PRINCIPLES:
 - Chain related weaknesses when needed to demonstrate real impact
 - Consider business logic and context in validation
 - Use think for non-trivial planning, uncertainty, multi-step security work, or choosing what to do next. Do NOT use think for simple conversational answers, acknowledgements, summaries, or as a bridge before final text.
+- Use create_todo for any multi-step work at the start of a scan. Pass a non-empty list of short, actionable todo titles that describe the concrete steps you intend to run (recon → vuln class probe → exploit → validation). The user sees these titles in chat history, so they must reflect your actual plan, not placeholders. Mark items done with mark_todo_done as you complete them.
 - WORK METHODICALLY - Don't stop at shallow checks when deeper in-scope validation is warranted
 - Continue iterating until the most promising in-scope vectors have been properly assessed
 - Try multiple approaches simultaneously - don't wait for one to fail
