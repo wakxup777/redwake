@@ -21,7 +21,10 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-_DEFAULT_PATH: Path = Path.home() / ".redwake" / "cli-config.json"
+# Match the documented path (README/INSTALL/FAQ all say
+# ~/.config/redwake/cli-config.json). The prior ~/.redwake location was never
+# documented and only ever held an empty {"env": {}} written by persist_current.
+_DEFAULT_PATH: Path = Path.home() / ".config" / "redwake" / "cli-config.json"
 _override: Path | None = None
 _cached: Settings | None = None
 
@@ -54,7 +57,14 @@ def apply_config_override(path: Path) -> None:
 
 
 def persist_current() -> None:
-    """Write currently-set env vars to the active config file (0o600)."""
+    """Write currently-set env vars to the active config file (0o600).
+
+    Merge semantics: env vars present in ``os.environ`` override whatever is
+    already on disk; keys only in the file are preserved. Without this, a user
+    who keeps their config *in the file* (no REDWAKE_* env vars exported) would
+    have persist_current overwrite it with ``{"env": {}}`` on every run,
+    silently erasing their model/key/endpoint.
+    """
     # Snapshot os.environ *before* load_settings() runs so that side-effects
     # from model loading (e.g. models.py injecting OPENAI_API_KEY) are not
     # mistakenly written as if the user explicitly set them.
@@ -63,7 +73,15 @@ def persist_current() -> None:
     target = _override or _DEFAULT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
 
+    # Start from whatever is already on disk so file-only keys survive.
     env_block: dict[str, str] = {}
+    with contextlib.suppress(json.JSONDecodeError, OSError):
+        existing = json.loads(target.read_text(encoding="utf-8"))
+        if isinstance(existing, dict):
+            existing_env = existing.get("env", {})
+            if isinstance(existing_env, dict):
+                env_block.update({str(k): str(v) for k, v in existing_env.items()})
+
     for sub_name in s.model_fields:
         sub_model = getattr(s, sub_name)
         if not isinstance(sub_model, BaseModel):

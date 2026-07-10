@@ -184,3 +184,79 @@ def test_persist_current_sets_0600_mode(tmp_path: Path, monkeypatch: pytest.Monk
     loader.persist_current()
 
     assert target.stat().st_mode & 0o777 == 0o600
+
+
+# --------------------------------------------------------------------------- #
+# Regression: default config path + persist merge semantics
+# --------------------------------------------------------------------------- #
+
+
+def test_default_config_path_is_xdg_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The default path must match the documented ~/.config/redwake location.
+
+    Regression for a bug where _DEFAULT_PATH pointed at ~/.redwake, which was
+    never documented and only ever held an empty {"env": {}} written by
+    persist_current — the user's real config at ~/.config/redwake was silently
+    ignored, so scans ran against the default model/endpoint and failed.
+    """
+    import re
+    from pathlib import Path
+
+    src = Path(loader.__file__).read_text(encoding="utf-8")
+    match = re.search(
+        r'_DEFAULT_PATH:\s*Path\s*=\s*Path\.home\(\)\s*/\s*"([^"]+)"\s*/\s*"([^"]+)"\s*/\s*"([^"]+)"',
+        src,
+    )
+    assert match, "_DEFAULT_PATH must be defined as Path.home() / seg / seg / seg"
+    assert (match.group(1), match.group(2), match.group(3)) == (
+        ".config",
+        "redwake",
+        "cli-config.json",
+    ), f"default path is {match.groups()}, expected ('.config','redwake','cli-config.json')"
+
+
+def test_persist_current_preserves_file_only_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """persist_current must not erase keys that exist only in the file.
+
+    Regression for a clobber bug: a user who keeps config in the file (no
+    REDWAKE_* env vars exported) had persist_current overwrite the file with
+    {"env": {}} on every run, destroying model/key/endpoint -> next scan fail.
+    """
+    target = tmp_path / "cli-config.json"
+    target.write_text(
+        json.dumps(
+            {"env": {"REDWAKE_LLM": "file-only-model", "REDWAKE_BASE_URL": "http://file/v1"}}
+        ),
+        encoding="utf-8",
+    )
+    # No REDWAKE_* env set — config is file-only.
+    monkeypatch.setattr(loader, "_cached", None)
+    loader.apply_config_override(target)
+
+    loader.persist_current()
+
+    out = json.loads(target.read_text(encoding="utf-8"))
+    assert out["env"]["REDWAKE_LLM"] == "file-only-model"
+    assert out["env"]["REDWAKE_BASE_URL"] == "http://file/v1"
+
+
+def test_persist_current_env_overrides_file_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Env-present keys still win over file keys on persist (merge, not blind keep)."""
+    target = tmp_path / "cli-config.json"
+    target.write_text(
+        json.dumps({"env": {"REDWAKE_LLM": "old-model", "REDWAKE_BASE_URL": "http://file/v1"}}),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("REDWAKE_LLM", "new-env-model")
+    monkeypatch.setattr(loader, "_cached", None)
+    loader.apply_config_override(target)
+
+    loader.persist_current()
+
+    out = json.loads(target.read_text(encoding="utf-8"))
+    assert out["env"]["REDWAKE_LLM"] == "new-env-model"  # env won
+    assert out["env"]["REDWAKE_BASE_URL"] == "http://file/v1"  # file-only survived
