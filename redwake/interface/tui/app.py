@@ -1659,6 +1659,12 @@ class RedWakeTUIApp(App):  # type: ignore[misc]
             self.notify("Scan loop is not ready; message was not sent", severity="warning")
             return
 
+        self.notify(
+            f"Message sent → {self._get_agent_name(target_agent_id)}",
+            severity="information",
+            timeout=2,
+        )
+
         self._displayed_events.clear()
         self._update_chat_view()
 

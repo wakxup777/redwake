@@ -121,7 +121,15 @@ class AgentCoordinator:
         await self._maybe_snapshot()
 
     async def send(self, target_agent_id: str, message: dict[str, Any]) -> bool:
-        """Deliver a user/peer message by appending it to the target SDK session."""
+        """Deliver a user/peer message by appending it to the target SDK session.
+
+        When ``interrupt_on_message`` is set and a live stream is attached, the
+        message arrives *while the agent is mid-turn*. Without a marker the LLM
+        often treats it as just another input and resumes its prior tool chain,
+        so the user perceives "the agent doesn't see my message." We therefore
+        wrap the user content with an explicit interrupt banner so the next
+        turn unambiguously answers the user first, then resumes its plan.
+        """
         async with self._lock:
             if target_agent_id not in self.statuses:
                 logger.debug("agent.send dropped unknown target=%s", target_agent_id)
@@ -136,8 +144,9 @@ class AgentCoordinator:
                 target_agent_id,
             )
             return False
+        item = self._message_to_session_item(message, interrupt=bool(interrupt))
         try:
-            await session.add_items([self._message_to_session_item(message)])
+            await session.add_items([item])
         except Exception:
             logger.exception(
                 "agent.send failed to append to SDK session target=%s",
@@ -247,10 +256,23 @@ class AgentCoordinator:
         async with self._lock:
             return dict(self.parent_of), dict(self.statuses), dict(self.names)
 
-    def _message_to_session_item(self, message: dict[str, Any]) -> TResponseInputItem:
+    def _message_to_session_item(
+        self, message: dict[str, Any], *, interrupt: bool = False
+    ) -> TResponseInputItem:
         sender = str(message.get("from", "unknown"))
         content = str(message.get("content", ""))
         if sender == "user":
+            if interrupt:
+                # The agent was mid-turn when the user interrupted it. Without this
+                # banner the model frequently resumes its prior tool chain and the
+                # user perceives their message as ignored. Tell it to answer first.
+                content = (
+                    "[INTERRUPT — the user sent this while you were working. "
+                    "STOP your current tool chain. Answer or acknowledge this "
+                    "message first. Only after addressing it, resume your prior "
+                    "plan if it still makes sense.]\n\n"
+                    f"{content}"
+                )
             return cast("TResponseInputItem", {"role": "user", "content": content})
         sender_name = self.names.get(sender, sender)
         msg_type = message.get("type", "information")
